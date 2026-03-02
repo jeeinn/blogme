@@ -304,11 +304,11 @@ final class App
     {
         $path = $this->request->path();
         if (str_starts_with($path, '/uploads/')) {
-            $this->serveFile($this->root . '/data' . $path, $this->root . '/data/uploads');
+            $this->serveFile($this->root . '/public' . $path, $this->root . '/public/uploads');
             return true;
         }
         if (str_starts_with($path, '/post/uploads/')) {
-            $this->serveFile($this->root . '/data/uploads/' . substr($path, strlen('/post/uploads/')), $this->root . '/data/uploads');
+            $this->serveFile($this->root . '/public/uploads/' . substr($path, strlen('/post/uploads/')), $this->root . '/public/uploads');
             return true;
         }
         if (str_starts_with($path, '/admin/assets/')) {
@@ -320,7 +320,7 @@ final class App
         }
         if (str_starts_with($path, '/admin/uploads/')) {
             $relative = substr($path, strlen('/admin/uploads/'));
-            $this->serveFile($this->root . '/data/uploads/' . $relative, $this->root . '/data/uploads');
+            $this->serveFile($this->root . '/public/uploads/' . $relative, $this->root . '/public/uploads');
             return true;
         }
         return false;
@@ -340,22 +340,24 @@ final class App
 
     private function outputFile(string $file): void
     {
-        $mime = 'application/octet-stream';
+        $mime = '';
         if (function_exists('mime_content_type')) {
             $detected = mime_content_type($file);
-            if (is_string($detected) && $detected !== '') {
+            if (is_string($detected) && $detected !== '' && strtolower($detected) !== 'application/octet-stream') {
                 $mime = $detected;
             }
-        } elseif (function_exists('finfo_open')) {
+        }
+        if ($mime === '' && function_exists('finfo_open')) {
             $finfo = finfo_open(FILEINFO_MIME_TYPE);
             if ($finfo !== false) {
                 $detected = finfo_file($finfo, $file);
                 finfo_close($finfo);
-                if (is_string($detected) && $detected !== '') {
+                if (is_string($detected) && $detected !== '' && strtolower($detected) !== 'application/octet-stream') {
                     $mime = $detected;
                 }
             }
-        } else {
+        }
+        if ($mime === '') {
             $ext = strtolower((string) pathinfo($file, PATHINFO_EXTENSION));
             $mimeMap = [
                 'css' => 'text/css; charset=utf-8',
@@ -370,6 +372,9 @@ final class App
             if (isset($mimeMap[$ext])) {
                 $mime = $mimeMap[$ext];
             }
+        }
+        if ($mime === '') {
+            $mime = 'application/octet-stream';
         }
         header('Content-Type: ' . $mime);
         readfile($file);

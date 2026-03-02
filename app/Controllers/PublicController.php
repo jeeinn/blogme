@@ -199,21 +199,36 @@ final class PublicController extends BaseController
         if ($base === false || $file === false || !str_starts_with($file, $base) || !is_file($file)) {
             throw new HttpException(404, 'asset not found');
         }
-        $mime = 'application/octet-stream';
+        $mime = '';
         if (function_exists('mime_content_type')) {
             $detected = mime_content_type($file);
-            if (is_string($detected) && $detected !== '') {
+            if (is_string($detected) && $detected !== '' && strtolower($detected) !== 'application/octet-stream') {
                 $mime = $detected;
             }
-        } elseif (function_exists('finfo_open')) {
+        }
+        if ($mime === '' && function_exists('finfo_open')) {
             $finfo = finfo_open(FILEINFO_MIME_TYPE);
             if ($finfo !== false) {
                 $detected = finfo_file($finfo, $file);
                 finfo_close($finfo);
-                if (is_string($detected) && $detected !== '') {
+                if (is_string($detected) && $detected !== '' && strtolower($detected) !== 'application/octet-stream') {
                     $mime = $detected;
                 }
             }
+        }
+        if ($mime === '') {
+            $ext = strtolower((string) pathinfo($file, PATHINFO_EXTENSION));
+            $mimeMap = [
+                'css' => 'text/css; charset=utf-8',
+                'js' => 'application/javascript; charset=utf-8',
+                'svg' => 'image/svg+xml',
+                'png' => 'image/png',
+                'jpg' => 'image/jpeg',
+                'jpeg' => 'image/jpeg',
+                'gif' => 'image/gif',
+                'webp' => 'image/webp',
+            ];
+            $mime = $mimeMap[$ext] ?? 'application/octet-stream';
         }
         header('Content-Type: ' . $mime);
         readfile($file);
