@@ -284,7 +284,9 @@ final class App
 
     private function pascalToSnake(string $key): string
     {
-        return strtolower((string) preg_replace('/(?<!^)[A-Z]/', '_$0', $key));
+        $step1 = (string) preg_replace('/([A-Z]+)([A-Z][a-z])/', '$1_$2', $key);
+        $step2 = (string) preg_replace('/([a-z0-9])([A-Z])/', '$1_$2', $step1);
+        return strtolower($step2);
     }
 
     private function clearExpiredTrashWhenDue(): void

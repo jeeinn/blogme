@@ -12,8 +12,16 @@
         <link rel="icon" type="image/png" href="{{ .URL.RelativeRoot }}assets/favicon.png">
         <title>Tunalog</title>
         <style>
+            html, body {
+                height: 100%;
+                overflow-y: auto;
+            }
             body {
                 font-family: "Noto Sans TC", "Noto Sans SC", "Noto Sans JP", "Noto Sans KR";
+            }
+            .has-flex-column {
+                min-height: 100vh;
+                height: auto !important;
             }
         </style>
     </head>

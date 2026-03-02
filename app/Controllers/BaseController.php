@@ -203,6 +203,12 @@ abstract class BaseController
         if ($raw === false) {
             throw new HttpException(500, 'Upload read failed');
         }
+        if (!function_exists('imagecreatefromstring')) {
+            if (!@move_uploaded_file($srcTmpPath, $dstPath)) {
+                copy($srcTmpPath, $dstPath);
+            }
+            return;
+        }
         $image = @imagecreatefromstring($raw);
         if ($image === false) {
             if (!@move_uploaded_file($srcTmpPath, $dstPath)) {
