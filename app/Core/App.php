@@ -340,7 +340,37 @@ final class App
 
     private function outputFile(string $file): void
     {
-        $mime = mime_content_type($file) ?: 'application/octet-stream';
+        $mime = 'application/octet-stream';
+        if (function_exists('mime_content_type')) {
+            $detected = mime_content_type($file);
+            if (is_string($detected) && $detected !== '') {
+                $mime = $detected;
+            }
+        } elseif (function_exists('finfo_open')) {
+            $finfo = finfo_open(FILEINFO_MIME_TYPE);
+            if ($finfo !== false) {
+                $detected = finfo_file($finfo, $file);
+                finfo_close($finfo);
+                if (is_string($detected) && $detected !== '') {
+                    $mime = $detected;
+                }
+            }
+        } else {
+            $ext = strtolower((string) pathinfo($file, PATHINFO_EXTENSION));
+            $mimeMap = [
+                'css' => 'text/css; charset=utf-8',
+                'js' => 'application/javascript; charset=utf-8',
+                'svg' => 'image/svg+xml',
+                'png' => 'image/png',
+                'jpg' => 'image/jpeg',
+                'jpeg' => 'image/jpeg',
+                'gif' => 'image/gif',
+                'webp' => 'image/webp',
+            ];
+            if (isset($mimeMap[$ext])) {
+                $mime = $mimeMap[$ext];
+            }
+        }
         header('Content-Type: ' . $mime);
         readfile($file);
     }

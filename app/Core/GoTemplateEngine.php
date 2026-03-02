@@ -511,7 +511,8 @@ final class GoTemplateEngine
             case '__':
                 $key = (string) ($args[0] ?? '');
                 $locale = (string) ($ctx['locale'] ?? 'en-us');
-                return ($ctx['is_theme'] ?? false) ? $this->locale->tt($key, $locale) : $this->locale->t($key, $locale);
+                $text = ($ctx['is_theme'] ?? false) ? $this->locale->tt($key, $locale) : $this->locale->t($key, $locale);
+                return new SafeString($text);
             case '_f':
                 $key = (string) ($args[0] ?? '');
                 $locale = (string) ($ctx['locale'] ?? 'en-us');

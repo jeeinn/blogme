@@ -3,9 +3,12 @@
 /db.sqlite
 /config.json
 /storage/rate_limit/*.json
-/storage/runtime/*.txt
+/storage/runtime/
+/storage/logs/
 /data/uploads/images/
 /data/uploads/covers/
+/public/uploads/
+/public/admin/assets/
 
 # Keep theme directory tracked but allow runtime customization in deployment
 !/data/themes/

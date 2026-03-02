@@ -476,7 +476,7 @@ final class AdminController extends BaseController
         }
 
         $clearCover = $this->toBool($this->request()->post('is_clear_cover', ''));
-        $coverPath = $this->app->root() . '/data/uploads/covers/' . $id . '.jpg';
+        $coverPath = $this->app->root() . '/public/uploads/covers/' . $id . '.jpg';
         if ($clearCover && is_file($coverPath)) {
             @unlink($coverPath);
         } elseif (!$clearCover) {
@@ -607,8 +607,8 @@ final class AdminController extends BaseController
         if ($path === '') {
             throw new HttpException(400, 'path required');
         }
-        $base = realpath($this->app->root() . '/data/uploads/images');
-        $target = realpath($this->app->root() . '/data/uploads/images/' . ltrim(str_replace('\\', '/', $path), '/'));
+        $base = realpath($this->app->root() . '/public/uploads/images');
+        $target = realpath($this->app->root() . '/public/uploads/images/' . ltrim(str_replace('\\', '/', $path), '/'));
         if ($base === false || $target === false || !str_starts_with($target, $base)) {
             throw new HttpException(403, 'Forbidden');
         }
@@ -630,7 +630,7 @@ final class AdminController extends BaseController
     /** @return array<int, array<string, string>> */
     private function collectPhotoFiles(): array
     {
-        $base = $this->app->root() . '/data/uploads/images';
+        $base = $this->app->root() . '/public/uploads/images';
         if (!is_dir($base)) {
             return [];
         }

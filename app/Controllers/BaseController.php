@@ -176,7 +176,7 @@ abstract class BaseController
         if (!is_array($file) || (int) ($file['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK) {
             return '';
         }
-        $dst = $this->app->root() . '/data/uploads/covers/' . $postId . '.jpg';
+        $dst = $this->app->root() . '/public/uploads/covers/' . $postId . '.jpg';
         $this->saveImageFile((string) $file['tmp_name'], $dst, 1024);
         return 'uploads/covers/' . $postId . '.jpg';
     }
@@ -187,7 +187,7 @@ abstract class BaseController
         $month = gmdate('m');
         $unix = (string) time();
         $id = $this->uuid();
-        $dir = $this->app->root() . '/data/uploads/images/' . $year . '/' . $month;
+        $dir = $this->app->root() . '/public/uploads/images/' . $year . '/' . $month;
         if (!is_dir($dir)) {
             mkdir($dir, 0755, true);
         }

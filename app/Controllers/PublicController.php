@@ -199,7 +199,23 @@ final class PublicController extends BaseController
         if ($base === false || $file === false || !str_starts_with($file, $base) || !is_file($file)) {
             throw new HttpException(404, 'asset not found');
         }
-        header('Content-Type: ' . (mime_content_type($file) ?: 'application/octet-stream'));
+        $mime = 'application/octet-stream';
+        if (function_exists('mime_content_type')) {
+            $detected = mime_content_type($file);
+            if (is_string($detected) && $detected !== '') {
+                $mime = $detected;
+            }
+        } elseif (function_exists('finfo_open')) {
+            $finfo = finfo_open(FILEINFO_MIME_TYPE);
+            if ($finfo !== false) {
+                $detected = finfo_file($finfo, $file);
+                finfo_close($finfo);
+                if (is_string($detected) && $detected !== '') {
+                    $mime = $detected;
+                }
+            }
+        }
+        header('Content-Type: ' . $mime);
         readfile($file);
     }
 

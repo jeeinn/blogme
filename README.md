@@ -68,7 +68,7 @@ composer install
 2. 启动（开发模式）
 
 ```bash
-php -S 127.0.0.1:8080 -t public
+php -S 127.0.0.1:8080 public/index.php
 ```
 
 3. 首次访问
@@ -95,4 +95,3 @@ php -S 127.0.0.1:8080 -t public
 共享主机、Apache 重写、权限、备份与上线建议见：
 
 - [DEPLOYMENT.md](./DEPLOYMENT.md)
-
