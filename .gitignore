@@ -1,0 +1,11 @@
+/vendor/
+/.phpunit.cache/
+/db.sqlite
+/config.json
+/storage/rate_limit/*.json
+/storage/runtime/*.txt
+/data/uploads/images/
+/data/uploads/covers/
+
+# Keep theme directory tracked but allow runtime customization in deployment
+!/data/themes/

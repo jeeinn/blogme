@@ -1,0 +1,98 @@
+# blogme
+
+`blogme` 是将 `tunalog` 从 Go 技术栈重构到 PHP 技术栈后的版本，保持原有功能模块、前端风格（Alpine + TocasUI）和 SQLite 存储模型。
+
+## 技术栈
+
+- PHP 8.1+
+- SQLite（PDO）
+- 前端：Alpine.js + TocasUI（与原项目一致）
+- 架构：MVC（Controller + Repository + Core Service）
+- 测试：PHPUnit
+
+## 已迁移功能
+
+- 初始化向导（`/wizard`）
+- 登录/登出（`/login`、`/admin/logout`）
+- 后台管理：
+  - 用户管理
+  - 文章管理（创建/编辑/回收站/删除/置顶/密码文章）
+  - 标签管理
+  - 导航管理
+  - 站点设置
+  - 外观设置
+  - 图片库上传/删除
+- 前台：
+  - 首页列表
+  - 文章详情（含密码解锁）
+  - 标签/作者/归档过滤
+  - RSS 输出（`/rss.xml`）
+  - 404 主题页
+- CLI：
+  - 重置密码：`php cli.php reset-password <email>`
+
+## 项目结构
+
+```text
+blogme/
+├─ app/
+│  ├─ Controllers/
+│  ├─ Core/
+│  ├─ Repositories/
+│  ├─ Services/
+│  └─ Support/
+├─ bootstrap/
+├─ public/
+├─ resources/
+│  ├─ templates/
+│  ├─ admin_assets/
+│  ├─ locales/
+│  └─ themes/default/
+├─ data/
+│  ├─ uploads/
+│  └─ themes/
+├─ storage/
+├─ tests/
+├─ cli.php
+└─ composer.json
+```
+
+## 快速开始
+
+1. 安装依赖
+
+```bash
+composer install
+```
+
+2. 启动（开发模式）
+
+```bash
+php -S 127.0.0.1:8080 -t public
+```
+
+3. 首次访问
+
+- 前台：`http://127.0.0.1:8080`
+- 向导：`http://127.0.0.1:8080/wizard`
+- 后台：`http://127.0.0.1:8080/admin`
+
+## 数据与配置
+
+- 数据库文件：`db.sqlite`
+- 站点配置：`config.json`
+- 上传目录：`data/uploads/`
+- 主题目录：`data/themes/`
+
+## 测试
+
+```bash
+./vendor/bin/phpunit
+```
+
+## 部署
+
+共享主机、Apache 重写、权限、备份与上线建议见：
+
+- [DEPLOYMENT.md](./DEPLOYMENT.md)
+
