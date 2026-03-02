@@ -165,6 +165,28 @@ final class PublicController extends BaseController
         echo '</channel></rss>';
     }
 
+    public function sitemap(array $vars, string $routePattern): void
+    {
+        $this->requireConfig();
+        $posts = $this->app->posts()->list([
+            'is_published' => true,
+            'is_trashed' => false,
+            'visibilities' => ['public'],
+        ], $this->app->config() ?? []);
+        $root = $this->request()->scheme() . '://' . $this->request()->host();
+
+        header('Content-Type: application/xml; charset=utf-8');
+        echo '<?xml version="1.0" encoding="UTF-8"?>';
+        echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
+        foreach ($posts as $post) {
+            echo '<url>';
+            echo '<loc>' . $this->xml($root . '/post/' . rawurlencode((string) $post['Slug'])) . '</loc>';
+            echo '<lastmod>' . gmdate('Y-m-d', (int) $post['UpdatedAt']) . '</lastmod>';
+            echo '</url>';
+        }
+        echo '</urlset>';
+    }
+
     public function asset(array $vars, string $routePattern): void
     {
         $theme = 'default';

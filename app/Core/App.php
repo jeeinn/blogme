@@ -243,6 +243,7 @@ final class App
         $this->router->post('/admin/photo/delete', fn (array $vars, string $pattern): mixed => $admin->photoDelete($vars, $pattern), 'admin.photos.delete');
 
         $this->router->get('/', fn (array $vars, string $pattern): mixed => $public->index($vars, $pattern), 'public.index');
+        $this->router->get('/sitemap.xml', fn (array $vars, string $pattern): mixed => $public->sitemap($vars, $pattern), 'public.sitemap');
         $this->router->get('/rss.xml', fn (array $vars, string $pattern): mixed => $public->rss($vars, $pattern), 'public.rss');
         $this->router->get('/assets/{asset}', fn (array $vars, string $pattern): mixed => $public->asset($vars, $pattern), 'public.asset');
         $this->router->get('/tag/{tag}', fn (array $vars, string $pattern): mixed => $public->index($vars, $pattern), 'public.tag');
