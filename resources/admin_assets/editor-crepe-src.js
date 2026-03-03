@@ -7,7 +7,23 @@ const buildUnsavedHandler = () => event => {
     event.returnValue = "";
 };
 
-const uploadImage = async (file, uploadUrl, csrfToken) => {
+const normalizeUploadPath = (path, urlRoot) => {
+    if (/^(?:[a-z]+:)?\/\//i.test(path) || path.startsWith("data:") || path.startsWith("blob:")) {
+        return path;
+    }
+    if (path.startsWith("/")) {
+        return path;
+    }
+
+    const safeRoot = (urlRoot ?? "/").trim();
+    const normalizedRoot = safeRoot === "" ? "/" : safeRoot;
+    const rootWithOneTrailingSlash = normalizedRoot.replace(/\/+$/, "/");
+    const normalizedPath = path.replace(/^\/+/, "");
+
+    return `${rootWithOneTrailingSlash}${normalizedPath}`;
+};
+
+const uploadImage = async (file, uploadUrl, csrfToken, urlRoot) => {
     const formData = new FormData();
     if (csrfToken) {
         formData.append("_csrf", csrfToken);
@@ -27,7 +43,7 @@ const uploadImage = async (file, uploadUrl, csrfToken) => {
     if (path === "") {
         throw new Error("Image upload returned an empty path.");
     }
-    return path;
+    return normalizeUploadPath(path, urlRoot);
 };
 
 export const initBlogmeCrepe = async (options = {}) => {
@@ -36,6 +52,7 @@ export const initBlogmeCrepe = async (options = {}) => {
     const holder = document.querySelector(options.holderSelector ?? "#block-editor");
     const uploadUrl = (options.uploadUrl ?? "").trim();
     const csrfToken = options.csrfToken ?? "";
+    const urlRoot = (options.urlRoot ?? "/").trim();
 
     if (!form || !contentInput || !holder) {
         return null;
@@ -58,7 +75,7 @@ export const initBlogmeCrepe = async (options = {}) => {
         }
     };
 
-    const imageUpload = async file => uploadImage(file, uploadUrl, csrfToken);
+    const imageUpload = async file => uploadImage(file, uploadUrl, csrfToken, urlRoot);
     const featureConfigs = uploadUrl === ""
         ? undefined
         : {
