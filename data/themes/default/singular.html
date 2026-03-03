@@ -22,8 +22,8 @@
     <meta property="article:tag" content="{{ .Name }}" />
     {{ end }}
     <!-- / og -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tocas/5.0.1/tocas.min.css" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tocas/5.0.1/tocas.min.js"></script>
+    <link rel="stylesheet" href="{{ .URL.RelativeRoot }}assets/tocas.min.css" />
+    <script src="{{ .URL.RelativeRoot }}assets/tocas.min.js"></script>
     {{ if .Config.HighlightJS }}
     <link rel="stylesheet" href="{{ .URL.RelativeRoot }}assets/highlight.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>

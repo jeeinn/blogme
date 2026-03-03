@@ -10,8 +10,8 @@
     <meta property="og:url" content="{{ .URL.Absolute }}" />
     <meta property="og:description" content="{{ .Config.Description }}" />
     <!-- / og -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tocas/5.0.1/tocas.min.css" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tocas/5.0.1/tocas.min.js"></script>
+    <link rel="stylesheet" href="{{ .URL.RelativeRoot }}assets/tocas.min.css" />
+    <script src="{{ .URL.RelativeRoot }}assets/tocas.min.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <link rel="stylesheet" href="{{ .URL.RelativeRoot }}assets/style.css" />
     <link rel="icon" type="image/png" href="{{ .URL.RelativeRoot }}assets/favicon.png">
