@@ -1,6 +1,5 @@
 {{ define "content" }}
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.css" />
-<link rel="stylesheet" href="{{ .URL.RelativeRoot }}admin/assets/style.css" />
 <script src="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.js"></script>
 <script src="//unpkg.com/alpinejs" defer></script>
 
@@ -316,7 +315,7 @@ const unsavedHandler = e => {
  */
 
 const data = {
-    json_data: `{{ .JSONData }}`,
+    json_data: {{ .JSONData | html }},
 
     onFileChange(e) {
         let file = e.target.files[0]
@@ -383,10 +382,11 @@ const data = {
     },
 
     init() {
-        let json_data = JSON.parse(this.json_data)
-
-        for (let key in json_data) {
-            this[key] = json_data[key]
+        if (!this.json_data || typeof this.json_data !== "object") {
+            return
+        }
+        for (let key in this.json_data) {
+            this[key] = this.json_data[key]
         }
     },
 }
