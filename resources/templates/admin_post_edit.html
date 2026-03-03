@@ -1,7 +1,7 @@
 {{ define "content" }}
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.css" />
 <script src="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.js"></script>
-<script src="//unpkg.com/alpinejs" defer></script>
+<script src="{{ .URL.RelativeRoot }}admin/assets/alpine.min.js" defer></script>
 
 <form method="POST" enctype="multipart/form-data" x-data="data" x-on:submit="onFormSubmit">
     <input type="hidden" name="_csrf" value="{{ .CSRF }}" />
