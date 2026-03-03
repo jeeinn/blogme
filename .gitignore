@@ -5,13 +5,17 @@
 /storage/rate_limit/*.json
 /storage/runtime/
 /storage/logs/
+/storage/cache/
 /data/uploads/images/
 /data/uploads/covers/
-/public/uploads/
+/public/uploads/**
 /public/admin/assets/
 /node_modules/
 
 # Keep theme directory tracked but allow runtime customization in deployment
 !/data/themes/
+!/public/uploads/
+!/public/uploads/covers/
+!/public/uploads/images/
 !/public/uploads/covers/.gitkeep
 !/public/uploads/images/.gitkeep
