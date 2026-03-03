@@ -1,6 +1,5 @@
 {{ define "content" }}
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.css" />
-<script src="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.js"></script>
+<link rel="stylesheet" href="{{ .URL.RelativeRoot }}admin/assets/editor-crepe.css" />
 <script src="{{ .URL.RelativeRoot }}admin/assets/alpine.min.js" defer></script>
 
 <form method="POST" enctype="multipart/form-data" x-data="data" x-on:submit="onFormSubmit">
@@ -28,7 +27,8 @@
                     <!-- / title -->
 
                     <!-- content -->
-                    <textarea id="content" name="content">{{ .Post.Content }}</textarea>
+                    <textarea id="content" name="content" style="display: none;">{{ .Post.Content }}</textarea>
+                    <div id="block-editor" class="block-editor has-top-spaced"></div>
                     <!-- / content -->
                 </div>
             </div>
@@ -268,47 +268,19 @@
     </div>
 </form>
 
+<script type="module">
+import { initBlogmeCrepe } from "{{ .URL.RelativeRoot }}admin/assets/editor-crepe.js"
+
+initBlogmeCrepe({
+    formSelector: "form[x-data='data']",
+    contentSelector: "#content",
+    holderSelector: "#block-editor",
+    uploadUrl: "../photos/api",
+    csrfToken: "{{ .CSRF }}",
+})
+</script>
+
 <script>
-/**
- * Easy MDE
- */
-
-const easy_mde = new EasyMDE({
-    element: document.getElementById("content"),
-    spellChecker: false,
-    status: false,
-    toolbar: ["heading", "bold", "italic", "quote", "code", "link", "|", "unordered-list", "ordered-list", "|", "upload-image", "table", "|", "preview"],
-    uploadImage: true,
-    renderingConfig: {
-        singleLineBreaks: false,
-    },
-    imageUploadFunction: (file, onSuccess, onError) => {
-        var formData = new FormData()
-        formData.append("_csrf", "{{ .CSRF }}")
-        formData.append("photo_file", file)
-
-        fetch("../photos/api", {
-            method: "POST",
-            body: formData,
-        })
-            .then(resp => resp.json())
-            .then(data => {
-                onSuccess(data.path)
-            })
-            .catch(onError)
-    },
-})
-
-easy_mde.codemirror.on("change", () => {
-    document.getElementById("content").value = easy_mde.value()
-    window.removeEventListener("beforeunload", unsavedHandler)
-    window.addEventListener("beforeunload", unsavedHandler)
-})
-
-const unsavedHandler = e => {
-    e.preventDefault()
-    e.returnValue = ""
-}
 
 /**
  * Alpine.js
@@ -335,7 +307,7 @@ const data = {
     },
 
     onFormSubmit() {
-        window.removeEventListener("beforeunload", unsavedHandler)
+        // handled by editor-crepe.js
     },
 
     resetCover() {

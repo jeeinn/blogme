@@ -1,0 +1,14 @@
+{
+  "name": "blogme-admin-editor",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Build tooling for blogme admin Milkdown Crepe editor assets",
+  "scripts": {
+    "build:admin-editor": "esbuild resources/admin_assets/editor-crepe-src.js --bundle --format=esm --target=es2020 --outfile=resources/admin_assets/editor-crepe.js --loader:.css=css --loader:.woff2=file --loader:.woff=file --loader:.ttf=file --loader:.otf=file --loader:.eot=file --loader:.svg=file --loader:.png=file --asset-names=editor-assets/[name]-[hash]"
+  },
+  "devDependencies": {
+    "@milkdown/crepe": "7.18.0",
+    "esbuild": "^0.25.9"
+  }
+}
+

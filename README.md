@@ -84,6 +84,13 @@ php -S 127.0.0.1:8080 public/index.php
 - 上传目录：`data/uploads/`
 - 主题目录：`data/themes/`
 
+## 编辑器与数据链路
+
+- 编辑器改造与 Markdown 持久化链路说明：[`docs/editor-markdown-pipeline.md`](./docs/editor-markdown-pipeline.md)
+- 若更新后台编辑器资源，请执行：
+  - `npm install`
+  - `npm run build:admin-editor`
+
 ## 测试
 
 ```bash

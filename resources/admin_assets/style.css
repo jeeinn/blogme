@@ -261,3 +261,16 @@ body {
 .EasyMDEContainer .CodeMirror-selected {
     background: var(--ts-gray-400) !important;
 }
+
+.block-editor {
+    flex: 1;
+    min-height: 480px;
+    margin-top: 1rem;
+    border: 1px solid var(--ts-gray-300);
+    background: var(--ts-gray-50);
+    overflow: auto;
+}
+
+.block-editor .milkdown {
+    min-height: 100%;
+}

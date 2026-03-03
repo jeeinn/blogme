@@ -9,6 +9,9 @@
 /data/uploads/covers/
 /public/uploads/
 /public/admin/assets/
+/node_modules/
 
 # Keep theme directory tracked but allow runtime customization in deployment
 !/data/themes/
+!/public/uploads/covers/.gitkeep
+!/public/uploads/images/.gitkeep

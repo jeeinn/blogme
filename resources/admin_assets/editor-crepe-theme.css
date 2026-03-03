@@ -1,0 +1,11 @@
+@import "../../node_modules/@milkdown/crepe/lib/theme/common/prosemirror.css";
+@import "../../node_modules/@milkdown/crepe/lib/theme/common/reset.css";
+@import "../../node_modules/@milkdown/crepe/lib/theme/common/block-edit.css";
+@import "../../node_modules/@milkdown/crepe/lib/theme/common/code-mirror.css";
+@import "../../node_modules/@milkdown/crepe/lib/theme/common/cursor.css";
+@import "../../node_modules/@milkdown/crepe/lib/theme/common/image-block.css";
+@import "../../node_modules/@milkdown/crepe/lib/theme/common/link-tooltip.css";
+@import "../../node_modules/@milkdown/crepe/lib/theme/common/list-item.css";
+@import "../../node_modules/@milkdown/crepe/lib/theme/common/placeholder.css";
+@import "../../node_modules/@milkdown/crepe/lib/theme/common/toolbar.css";
+@import "../../node_modules/@milkdown/crepe/lib/theme/common/table.css";
