@@ -1,4 +1,3 @@
-{{ define "pagination" }}
 <div class="ts-pagination is-secondary">
     <a class="item is-back {if eq($ctx->Pagination->CurrentPage, 1)}is-disabled{/if}" href="?{=$ctx->Pagination->Query}page={=sub($ctx->Pagination->CurrentPage, 1)}"></a>
 
@@ -26,4 +25,3 @@
 
     <a href="?{=$ctx->Pagination->Query}page={=add($ctx->Pagination->CurrentPage, 1)}" class="item is-next {if eq($ctx->Pagination->CurrentPage, $ctx->Pagination->TotalPages)}is-disabled{/if}"></a>
 </div>
-{{ end }}

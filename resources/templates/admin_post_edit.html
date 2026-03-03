@@ -1,4 +1,5 @@
-{{ define "content" }}
+{layout 'admin_base.html'}
+{block content}
 <link rel="stylesheet" href="{=$ctx->URL->RelativeRoot}admin/assets/editor-crepe.css" />
 <script src="{=$ctx->URL->RelativeRoot}admin/assets/alpine.min.js" defer></script>
 
@@ -269,15 +270,15 @@
 </form>
 
 <script type="module">
-import { initBlogmeCrepe } from "{=$ctx->URL->RelativeRoot}admin/assets/editor-crepe.js"
+import { initBlogmeCrepe } from {=$ctx->URL->RelativeRoot . 'admin/assets/editor-crepe.js'}
 
 initBlogmeCrepe({
     formSelector: "form[x-data='data']",
     contentSelector: "#content",
     holderSelector: "#block-editor",
     uploadUrl: "../photos/api",
-    csrfToken: "{=$ctx->CSRF}",
-    urlRoot: "{=$ctx->URL->RelativeRoot}",
+    csrfToken: {=$ctx->CSRF},
+    urlRoot: {=$ctx->URL->RelativeRoot},
 })
 </script>
 
@@ -288,7 +289,22 @@ initBlogmeCrepe({
  */
 
 const data = {
-    json_data: {=$ctx->JSONData|html},
+    visibility: "public",
+    cover_image_url: "",
+    tags: [],
+    tags_str: "",
+    slug: "",
+    tag_input_value: "",
+    published_datetime: "",
+    published_at: "",
+    is_clear_cover: false,
+    json_data: (() => {
+        try {
+            return JSON.parse({=$ctx->JSONData})
+        } catch (_) {
+            return {}
+        }
+    })(),
 
     onFileChange(e) {
         let file = e.target.files[0]
@@ -364,4 +380,4 @@ const data = {
     },
 }
 </script>
-{{ end }}
+{/block}

@@ -1,4 +1,5 @@
-{{ define "content" }}
+{layout 'admin_base.html'}
+{block content}
 <link rel="stylesheet" href="{=$ctx->URL->RelativeRoot}admin/assets/editor-crepe.css" />
 <script src="{=$ctx->URL->RelativeRoot}admin/assets/alpine.min.js" defer></script>
 
@@ -260,15 +261,15 @@
 </form>
 
 <script type="module">
-import { initBlogmeCrepe } from "{=$ctx->URL->RelativeRoot}admin/assets/editor-crepe.js"
+import { initBlogmeCrepe } from {=$ctx->URL->RelativeRoot . 'admin/assets/editor-crepe.js'}
 
 initBlogmeCrepe({
     formSelector: "form[x-data='data']",
     contentSelector: "#content",
     holderSelector: "#block-editor",
     uploadUrl: "../photos/api",
-    csrfToken: "{=$ctx->CSRF}",
-    urlRoot: "{=$ctx->URL->RelativeRoot}",
+    csrfToken: {=$ctx->CSRF},
+    urlRoot: {=$ctx->URL->RelativeRoot},
 })
 </script>
 
@@ -318,7 +319,7 @@ const data = {
             .trim()
             .toLowerCase()
             .replace(/\s+/g, "-")
-            .replace(/[^A-Za-z0-9\-._~!$&'()*+,;=\p{L}\p{N}]/gu, "")
+            .replace(new RegExp({=json_encode("[^A-Za-z0-9\\-._~!$&'()*+,;=\\p{L}\\p{N}]")}, "gu"), "")
     },
 
     onFormSubmit() {
@@ -387,4 +388,4 @@ const data = {
     },
 }
 </script>
-{{ end }}
+{/block}

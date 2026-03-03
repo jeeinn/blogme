@@ -441,9 +441,19 @@ final class AdminController extends BaseController
         if ($post === null) {
             throw new HttpException(404, 'Post not found');
         }
+        $coverImageUrl = (string) $post['Cover'];
+        if (
+            $coverImageUrl !== ''
+            && !str_starts_with($coverImageUrl, '/')
+            && !preg_match('#^(?:[a-z]+:)?//#i', $coverImageUrl)
+            && !str_starts_with($coverImageUrl, 'data:')
+            && !str_starts_with($coverImageUrl, 'blob:')
+        ) {
+            $coverImageUrl = $this->app->routeRelativeRoot($routePattern) . ltrim($coverImageUrl, '/');
+        }
         $jsonData = json_encode([
             'visibility' => $post['Visibility'],
-            'cover_image_url' => $post['Cover'],
+            'cover_image_url' => $coverImageUrl,
             'tags' => array_map(static fn (array $t): string => (string) $t['Name'], $post['Tags']),
             'tags_str' => $post['TagsStr'],
             'slug' => $post['Slug'],
@@ -630,29 +640,65 @@ final class AdminController extends BaseController
     /** @return array<int, array<string, string>> */
     private function collectPhotoFiles(): array
     {
-        $base = $this->app->root() . '/public/uploads/images';
-        if (!is_dir($base)) {
+        $base = realpath($this->app->root() . '/public/uploads/images');
+        if ($base === false || !is_dir($base)) {
             return [];
         }
-        $rii = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($base));
+
+        $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'avif', 'svg'];
+        $normalizedBase = str_replace('\\', '/', $base);
+        $rii = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($base, \FilesystemIterator::SKIP_DOTS)
+        );
         $files = [];
+
         foreach ($rii as $file) {
             if (!$file->isFile()) {
                 continue;
             }
-            $segments = explode(DIRECTORY_SEPARATOR, $file->getPath());
-            $count = count($segments);
-            if ($count < 2) {
+
+            $filename = $file->getFilename();
+            if ($filename === '' || str_starts_with($filename, '.')) {
                 continue;
             }
-            $year = $segments[$count - 2] ?? '';
-            $month = $segments[$count - 1] ?? '';
+
+            $ext = strtolower((string) pathinfo($filename, PATHINFO_EXTENSION));
+            if ($ext === '' || !in_array($ext, $allowedExtensions, true)) {
+                continue;
+            }
+
+            $normalizedPathname = str_replace('\\', '/', $file->getPathname());
+            if (!str_starts_with($normalizedPathname, $normalizedBase . '/')) {
+                continue;
+            }
+
+            $relative = substr($normalizedPathname, strlen($normalizedBase) + 1);
+            if ($relative === '' || $relative === false) {
+                continue;
+            }
+
+            $segments = explode('/', $relative);
+            if (count($segments) !== 3) {
+                continue;
+            }
+            [$year, $month, $name] = $segments;
+            if (!preg_match('/^\d{4}$/', $year)) {
+                continue;
+            }
+            if (!preg_match('/^(0[1-9]|1[0-2])$/', $month)) {
+                continue;
+            }
+            if ($name === '' || str_contains($name, '/')) {
+                continue;
+            }
+
             $files[] = [
                 'Year' => $year,
                 'Month' => $month,
-                'Filename' => $file->getFilename(),
+                'Filename' => $name,
             ];
         }
+
         return $files;
     }
 

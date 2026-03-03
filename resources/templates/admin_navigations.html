@@ -1,4 +1,5 @@
-{{ define "content" }}
+{layout 'admin_base.html'}
+{block content}
 <div id="content-container" class="ts-container has-vertically-padded-large has-bottom-padded-huge">
     {if $ctx->Message}
     <div class="ts-notice has-bottom-spaced-large">
@@ -109,4 +110,4 @@
         });
     });
 </script>
-{{ end }}
+{/block}

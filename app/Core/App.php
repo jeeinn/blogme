@@ -311,6 +311,10 @@ final class App
             $this->serveFile($this->root . '/public/uploads/' . substr($path, strlen('/post/uploads/')), $this->root . '/public/uploads');
             return true;
         }
+        if (str_starts_with($path, '/admin/post/uploads/')) {
+            $this->serveFile($this->root . '/public/uploads/' . substr($path, strlen('/admin/post/uploads/')), $this->root . '/public/uploads');
+            return true;
+        }
         if (str_starts_with($path, '/assets/')) {
             $theme = 'default';
             if ($this->configExists()) {

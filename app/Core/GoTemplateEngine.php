@@ -9,7 +9,7 @@ use Blogme\Support\DateFormat;
 use Blogme\Support\Markdown;
 use Countable;
 use Latte\Engine;
-use Latte\Loaders\StringLoader;
+use Latte\Loaders\FileLoader;
 use Latte\Runtime\Html;
 use Traversable;
 
@@ -33,65 +33,49 @@ final class GoTemplateEngine
 
     public function renderAdmin(string $template, array $data): string
     {
-        $base = $this->read($this->root . '/resources/templates/admin_base.html');
-        $content = $this->read($this->root . '/resources/templates/' . $template . '.html');
-        $content = $this->stripDefine($content, 'content');
-
-        if (str_contains($content, '{{ template "pagination" . }}')) {
-            $pagination = $this->stripDefine($this->read($this->root . '/resources/templates/admin_pagination.html'), 'pagination');
-            $content = str_replace('{{ template "pagination" . }}', $pagination, $content);
-        }
-
-        $merged = str_replace('{{ template "content" . }}', $content, $base);
-        return $this->renderString($merged, $data, false);
+        return $this->renderTemplateFile(
+            $this->root . '/resources/templates',
+            $template . '.html',
+            $data,
+            false
+        );
     }
 
     public function renderPage(string $template, array $data): string
     {
-        $content = $this->read($this->root . '/resources/templates/' . $template . '.html');
-        return $this->renderString($content, $data, false);
+        return $this->renderTemplateFile(
+            $this->root . '/resources/templates',
+            $template . '.html',
+            $data,
+            false
+        );
     }
 
     public function renderTheme(string $templateFile, string $theme, array $data): string
     {
         $this->locale->loadThemeLocale($theme);
-        $content = $this->read($this->root . '/data/themes/' . $theme . '/' . $templateFile);
-        if (str_contains($content, '{{ template "author.html" . }}')) {
-            $author = $this->read($this->root . '/data/themes/' . $theme . '/author.html');
-            $content = str_replace('{{ template "author.html" . }}', $author, $content);
-        }
-        return $this->renderString($content, $data, true);
+        return $this->renderTemplateFile(
+            $this->root . '/data/themes/' . $theme,
+            $templateFile,
+            $data,
+            true
+        );
     }
 
-    private function stripDefine(string $template, string $define): string
+    private function renderTemplateFile(string $baseDir, string $templateFile, array $rootData, bool $isTheme): string
     {
-        $pattern = '/^\s*\{\{\s*define\s+"' . preg_quote($define, '/') . '"\s*\}\}(.*)\{\{\s*end\s*\}\}\s*$/s';
-        if (preg_match($pattern, $template, $m) === 1) {
-            return $m[1];
+        if (!is_file($baseDir . '/' . $templateFile)) {
+            throw new HttpException(500, 'Template not found: ' . $baseDir . '/' . $templateFile);
         }
-        return $template;
-    }
-
-    private function read(string $file): string
-    {
-        $content = file_get_contents($file);
-        if (!is_string($content)) {
-            throw new HttpException(500, 'Template not found: ' . $file);
-        }
-        return $content;
-    }
-
-    private function renderString(string $template, array $rootData, bool $isTheme): string
-    {
         $config = is_array($rootData['Config'] ?? null) ? $rootData['Config'] : [];
         $this->isThemeRender = $isTheme;
         $this->renderLocale = (string) ($config['Locale'] ?? 'en-us');
         $this->renderDateFormat = (string) ($config['DateFormat'] ?? '2006-01-02');
 
         $latte = clone $this->engine;
-        $latte->setLoader(new StringLoader());
+        $latte->setLoader(new FileLoader($baseDir));
 
-        return $latte->renderToString($template, [
+        return $latte->renderToString($templateFile, [
             'ctx' => $this->normalizeData($rootData),
         ]);
     }

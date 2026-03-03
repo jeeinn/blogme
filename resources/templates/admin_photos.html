@@ -1,4 +1,5 @@
-{{ define "content" }}
+{layout 'admin_base.html'}
+{block content}
 <div class="ts-app-layout is-horizontal">
     <div class="cell is-fluid is-secondary is-scrollable">
         <div id="content-container" class="ts-container has-top-spaced-large has-bottom-spaced-big">
@@ -73,11 +74,11 @@
 
             <div class="ts-grid is-end-aligned has-top-spaced">
                 <div class="column">
-                    {{ template "pagination" . }}
+                    {include 'admin_pagination.html'}
                 </div>
             </div>
             {/if}
         </div>
     </div>
 </div>
-{{ end }}
+{/block}

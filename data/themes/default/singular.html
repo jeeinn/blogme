@@ -117,7 +117,7 @@
                 {=$ctx->Config->InjectedPostStart}
 
                 {if eq($ctx->Config->AuthorBlock, 'start')}
-                    {{ template "author.html" . }}
+                    {include 'author.html'}
                 {/if}
 
                 <div id="singular-content" class="has-top-spaced-large">
@@ -133,7 +133,7 @@
                 {/if}
 
                 {if eq($ctx->Config->AuthorBlock, 'end')}
-                    {{ template "author.html" . }}
+                    {include 'author.html'}
                 {/if}
 
                 {=$ctx->Config->InjectedPostEnd}

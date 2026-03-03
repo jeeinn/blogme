@@ -1,4 +1,5 @@
-{{ define "content" }}
+{layout 'admin_base.html'}
+{block content}
 <link rel="stylesheet" href="{=$ctx->URL->RelativeRoot}admin/assets/style.css" />
 <div id="content-container" class="ts-container has-vertically-padded-large has-bottom-padded-huge">
     {if $ctx->Message}
@@ -187,4 +188,4 @@
         </div>
     </div>
 </div>
-{{ end }}
+{/block}
