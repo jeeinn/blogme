@@ -2,81 +2,81 @@
 <div class="ts-app-layout is-horizontal">
     <div class="cell is-fluid is-secondary is-scrollable">
         <div id="content-container" class="ts-container has-top-spaced-large has-bottom-spaced-big">
-            {{ if .Message }}
+            {if $ctx->Message}
             <div class="ts-notice has-bottom-spaced-large">
-                <div class="title">{{ __ "notice_title" }}</div>
-                <div class="content">{{ .Message }}</div>
+                <div class="title">{=tr('notice_title')}</div>
+                <div class="content">{=$ctx->Message}</div>
             </div>
-            {{ end }}
+            {/if}
 
-            <div class="ts-header">{{ __ "photos_photos" }}</div>
+            <div class="ts-header">{=tr('photos_photos')}</div>
 
             <form method="POST" enctype="multipart/form-data">
-                <input type="hidden" name="_csrf" value="{{ .CSRF }}" />
+                <input type="hidden" name="_csrf" value="{=$ctx->CSRF}" />
                 <div class="ts-box has-top-spaced">
                     <div class="ts-content is-vertically-padded">
                         <div class="ts-control">
-                            <div class="label">{{ __ "photos_file" }}</div>
+                            <div class="label">{=tr('photos_file')}</div>
                             <div class="content">
                                 <div class="ts-file">
                                     <input type="file" name="photo_file[]" multiple accept="image/*" required />
                                 </div>
                                     <div class="ts-text is-description has-top-spaced-small">
-                                    {{ __ "photos_file_description" }}
+                                    {=tr('photos_file_description')}
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="ts-divider"></div>
                     <div class="ts-content is-dense is-secondary is-end-aligned">
-                        <button type="submit" class="ts-button">{{ __ "button_upload" }}</button>
+                        <button type="submit" class="ts-button">{=tr('button_upload')}</button>
                     </div>
                 </div>
             </form>
 
 
             <div class="ts-header has-top-spaced-big">
-                {{ __ "photos_list" }} {{ if .Pagination.TotalCount }}
-                <span class="ts-badge is-start-spaced is-small">{{ .Pagination.TotalCount }}</span>
-                {{ end }}
+                {=tr('photos_list')} {if $ctx->Pagination->TotalCount}
+                <span class="ts-badge is-start-spaced is-small">{=$ctx->Pagination->TotalCount}</span>
+                {/if}
             </div>
 
-            {{ if not .Files }}
+            {if bool_not($ctx->Files)}
             <div class="ts-content is-tertiary is-vertically-very-padded has-top-spaced">
-                <div class="ts-text is-center-aligned is-secondary">{{ __ "photos_notfound" }}</div>
+                <div class="ts-text is-center-aligned is-secondary">{=tr('photos_notfound')}</div>
             </div>
-            {{ else }} {{ range $groupKey, $group := .Files }}
-            <div class="ts-divider is-section is-start-text">{{ .Year }} / {{ .Month }}</div>
+            {else} {foreach $ctx->Files as $groupKey => $group}
+            <div class="ts-divider is-section is-start-text">{=$group->Year} / {=$group->Month}</div>
             <div class="ts-grid is-5-columns">
-                {{ range $fileKey, $file := .Filenames }}
+                {foreach $group->Filenames as $fileKey => $file}
                 <div class="column">
-                    <button class="ts-image is-1-by-1 is-bordered is-rounded" data-dropdown="dropdown-{{ $groupKey }}-{{ $fileKey }}">
-                        <img src="{{ $.URL.RelativeRoot }}uploads/images/{{ $group.Year }}/{{ $group.Month }}/{{ . }}" />
+                    <button class="ts-image is-1-by-1 is-bordered is-rounded" data-dropdown="dropdown-{=$groupKey}-{=$fileKey}">
+                        <img src="{=$ctx->URL->RelativeRoot}uploads/images/{=$group->Year}/{=$group->Month}/{=$file}" />
                     </button>
-                    <form action="{{ $.URL.RelativeRoot }}admin/photo/delete?{{ $.Pagination.Query }}page={{ $.Pagination.CurrentPage }}" method="POST" onsubmit="return confirm(`{{ __ "alert_deletephoto" }}`)">
-                        <input type="hidden" name="_csrf" value="{{ $.CSRF }}" />
-                        <input name="path" type="hidden" value="{{ $group.Year }}/{{ $group.Month }}/{{ . }}" />
-                        <div class="ts-dropdown" id="dropdown-{{ $groupKey }}-{{ $fileKey }}">
-                            <a href="{{ $.URL.RelativeRoot }}uploads/images/{{ $group.Year }}/{{ $group.Month }}/{{ . }}" target="_blank" class="item">
-                                {{ __ "photos_dropdown_view" }}
+                    <form action="{=$ctx->URL->RelativeRoot}admin/photo/delete?{=$ctx->Pagination->Query}page={=$ctx->Pagination->CurrentPage}" method="POST" onsubmit="return confirm(`{=tr('alert_deletephoto')}`)">
+                        <input type="hidden" name="_csrf" value="{=$ctx->CSRF}" />
+                        <input name="path" type="hidden" value="{=$group->Year}/{=$group->Month}/{=$file}" />
+                        <div class="ts-dropdown" id="dropdown-{=$groupKey}-{=$fileKey}">
+                            <a href="{=$ctx->URL->RelativeRoot}uploads/images/{=$group->Year}/{=$group->Month}/{=$file}" target="_blank" class="item">
+                                {=tr('photos_dropdown_view')}
                             </a>
                             <div class="divider"></div>
                             <button type="submit" class="item" style="--color: var(--ts-negative-400)">
-                                {{ __ "photos_dropdown_delete" }}
+                                {=tr('photos_dropdown_delete')}
                             </button>
                         </div>
                     </form>
                 </div>
-                {{ end }}
+                {/foreach}
             </div>
-            {{ end }}
+            {/foreach}
 
             <div class="ts-grid is-end-aligned has-top-spaced">
                 <div class="column">
                     {{ template "pagination" . }}
                 </div>
             </div>
-            {{ end }}
+            {/if}
         </div>
     </div>
 </div>

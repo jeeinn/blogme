@@ -1,33 +1,33 @@
 {{ define "content" }}
-<link rel="stylesheet" href="{{ .URL.RelativeRoot }}admin/assets/editor-crepe.css" />
-<script src="{{ .URL.RelativeRoot }}admin/assets/alpine.min.js" defer></script>
+<link rel="stylesheet" href="{=$ctx->URL->RelativeRoot}admin/assets/editor-crepe.css" />
+<script src="{=$ctx->URL->RelativeRoot}admin/assets/alpine.min.js" defer></script>
 
 <form method="POST" enctype="multipart/form-data" x-data="data" x-on:submit="onFormSubmit">
-    <input type="hidden" name="_csrf" value="{{ .CSRF }}" />
+    <input type="hidden" name="_csrf" value="{=$ctx->CSRF}" />
     <div class="ts-container has-vertically-padded-large">
-        <div class="ts-header">{{ __ "postedit_postedit" }}</div>
+        <div class="ts-header">{=tr('postedit_postedit')}</div>
 
         <div class="ts-grid has-top-spaced">
             <!-- left column -->
             <div class="column is-fluid has-flex has-flex-column">
                 <div id="editor-column">
                     <!-- message -->
-                    {{ if .Message }}
+                    {if $ctx->Message}
                     <div class="ts-notice has-bottom-spaced-large">
-                        <div class="title">{{ __ "notice_title" }}</div>
-                        <div class="content">{{ .Message }}</div>
+                        <div class="title">{=tr('notice_title')}</div>
+                        <div class="content">{=$ctx->Message}</div>
                     </div>
-                    {{ end }}
+                    {/if}
                     <!-- / message -->
 
                     <!-- title -->
                     <div class="ts-input is-large">
-                        <input id="title-input" type="text" name="title" placeholder="{{ __ "postcreate_title_placeholder"}}" value="{{ .Post.Title }}" required />
+                        <input id="title-input" type="text" name="title" placeholder="{=tr('postcreate_title_placeholder')}" value="{=$ctx->Post->Title}" required />
                     </div>
                     <!-- / title -->
 
                     <!-- content -->
-                    <textarea id="content" name="content" style="display: none;">{{ .Post.Content }}</textarea>
+                    <textarea id="content" name="content" style="display: none;">{=$ctx->Post->Content}</textarea>
                     <div id="block-editor" class="block-editor has-top-spaced"></div>
                     <!-- / content -->
                 </div>
@@ -40,11 +40,11 @@
                     <div class="ts-content is-dense is-secondary">
                         <div class="ts-grid is-middle-aligned">
                             <div class="column is-fluid">
-                                <div class="ts-text is-bold">{{ __ "postcreate_publish" }}</div>
+                                <div class="ts-text is-bold">{=tr('postcreate_publish')}</div>
                             </div>
                             <div class="column">
-                                <a href="{{ .URL.RelativeRoot }}post/{{ .Post.Slug }}" class="ts-text is-small is-link is-undecorated is-external-link" target="_blank">
-                                    {{ __ "postedit_viewpost" }}
+                                <a href="{=$ctx->URL->RelativeRoot}post/{=$ctx->Post->Slug}" class="ts-text is-small is-link is-undecorated is-external-link" target="_blank">
+                                    {=tr('postedit_viewpost')}
                                 </a>
                             </div>
                         </div>
@@ -54,14 +54,14 @@
                         <!-- visibility -->
                         <div class="ts-text is-label">
                             <span class="ts-icon is-eye-icon is-end-spaced"></span>
-                            {{ __ "postcreate_visibility" }}
+                            {=tr('postcreate_visibility')}
                         </div>
                         <div class="ts-select is-fluid has-top-spaced">
                             <select name="visibility" x-model="visibility">
-                                <option value="public" selected>{{ __ "postcreate_visibility_public" }}</option>
-                                <option value="private">{{ __ "postcreate_visibility_private" }}</option>
-                                <option value="password">{{ __ "postcreate_visibility_password" }}</option>
-                                <option value="draft">{{ __ "postcreate_visibility_draft" }}</option>
+                                <option value="public" selected>{=tr('postcreate_visibility_public')}</option>
+                                <option value="private">{=tr('postcreate_visibility_private')}</option>
+                                <option value="password">{=tr('postcreate_visibility_password')}</option>
+                                <option value="draft">{=tr('postcreate_visibility_draft')}</option>
                             </select>
                         </div>
                         <!-- / visibility -->
@@ -70,7 +70,7 @@
                         <div class="has-top-spaced-small" x-bind:class="visibility !== 'password' ? 'has-hidden' : ''">
                             <div class="ts-input is-start-icon">
                                 <span class="ts-icon is-key-icon"></span>
-                                <input type="text" name="password" placeholder="{{ __ "postcreate_visibility_password_placeholder" }}" value="{{ .Post.Password }}" />
+                                <input type="text" name="password" placeholder="{=tr('postcreate_visibility_password_placeholder')}" value="{=$ctx->Post->Password}" />
                             </div>
                         </div>
                         <!-- / password -->
@@ -78,13 +78,13 @@
                         <!-- author_id -->
                         <div class="ts-text is-label has-top-spaced-large">
                             <span class="ts-icon is-user-icon is-end-spaced"></span>
-                            {{ __ "postcreate_author" }}
+                            {=tr('postcreate_author')}
                         </div>
                         <div class="ts-select is-fluid has-top-spaced">
                             <select name="author_id">
-                                {{ range .Users }}
-                                <option value="{{ .ID }}" {{ if eq $.Post.Author.ID .ID }}selected{{ end }}>{{ .Nickname }}</option>
-                                {{ end }}
+                                {foreach $ctx->Users as $dot1}
+                                <option value="{=$dot1->ID}" {if eq($ctx->Post->Author->ID, $dot1->ID)}selected{/if}>{=$dot1->Nickname}</option>
+                                {/foreach}
                             </select>
                         </div>
                         <!-- / author_id -->
@@ -92,7 +92,7 @@
                         <!-- published_at -->
                         <div class="ts-text is-label has-top-spaced-large">
                             <span class="ts-icon is-clock-icon is-end-spaced"></span>
-                            {{ __ "postcreate_publishedat" }}
+                            {=tr('postcreate_publishedat')}
                         </div>
                         <div class="ts-input has-top-spaced">
                             <input type="datetime-local" x-model="published_datetime" x-on:change="onPublishDateChange" />
@@ -105,8 +105,8 @@
                         <div class="ts-grid">
                             <div class="column is-fluid">
                                 <!-- delete button -->
-                                <button class="ts-button is-outlined is-negative" type="submit" formaction="{{ .Post.ID }}/trash">
-                                    {{ __ "button_trashpost" }}
+                                <button class="ts-button is-outlined is-negative" type="submit" formaction="{=$ctx->Post->ID}/trash">
+                                    {=tr('button_trashpost')}
                                 </button>
                                 <!-- / delete button -->
                             </div>
@@ -114,7 +114,7 @@
                                 <!-- save button -->
                                 <button class="ts-button is-start-labeled-icon" type="submit">
                                     <span class="ts-icon is-floppy-disk-icon"></span>
-                                    {{ __ "button_savepost" }}
+                                    {=tr('button_savepost')}
                                 </button>
                                 <!-- / save button -->
                             </div>
@@ -126,7 +126,7 @@
                 <!-- tags -->
                 <div class="ts-box has-top-spaced-large">
                     <div class="ts-content is-dense is-secondary">
-                        <div class="ts-text is-bold">{{ __ "postcreate_tags" }}</div>
+                        <div class="ts-text is-bold">{=tr('postcreate_tags')}</div>
                     </div>
                     <div class="ts-divider"></div>
                     <div class="ts-content">
@@ -134,7 +134,7 @@
                         <div class="ts-grid is-middle-aligned">
                             <div class="column is-fluid">
                                 <div class="ts-input">
-                                    <input list="tag-list" placeholder="{{ __ "postcreate_tags_placeholder" }}" x-on:keydown="onKeydownTag" x-model="tag_input_value" />
+                                    <input list="tag-list" placeholder="{=tr('postcreate_tags_placeholder')}" x-on:keydown="onKeydownTag" x-model="tag_input_value" />
                                 </div>
                             </div>
                             <div class="column">
@@ -157,27 +157,27 @@
                         <!-- / chips -->
 
                         <!-- most used tags -->
-                        {{ if .MostUsedTags }}
+                        {if $ctx->MostUsedTags}
                         <details class="ts-accordion has-top-spaced">
-                            <summary>{{ __ "postcreate_tags_showcommon" }}</summary>
+                            <summary>{=tr('postcreate_tags_showcommon')}</summary>
                             <div class="ts-box">
                                 <div class="ts-content">
                                     <div class="ts-wrap is-compact">
-                                        {{ range .MostUsedTags }}
-                                        <button type="button" class="ts-text is-link is-undecorated" x-on:click="addTag('{{ .Name }}')">#{{ .Name }}</button>
-                                        {{ end }}
+                                        {foreach $ctx->MostUsedTags as $dot2}
+                                        <button type="button" class="ts-text is-link is-undecorated" x-on:click="addTag('{=$dot2->Name}')">#{=$dot2->Name}</button>
+                                        {/foreach}
                                     </div>
                                 </div>
                             </div>
                         </details>
-                        {{ end }}
+                        {/if}
                         <!-- / most used tags -->
 
                         <!-- datalist -->
                         <datalist id="tag-list">
-                            {{ range .Tags }}
-                            <option value="{{ .Name }}"></option>
-                            {{ end }}
+                            {foreach $ctx->Tags as $dot3}
+                            <option value="{=$dot3->Name}"></option>
+                            {/foreach}
                         </datalist>
                         <input type="hidden" name="tags" x-model="tags_str" />
                         <!-- / datalist -->
@@ -188,14 +188,14 @@
                 <!-- information -->
                 <div class="ts-box has-top-spaced-large">
                     <div class="ts-content is-dense is-secondary">
-                        <div class="ts-text is-bold">{{ __ "postcreate_information" }}</div>
+                        <div class="ts-text is-bold">{=tr('postcreate_information')}</div>
                     </div>
                     <div class="ts-divider"></div>
                     <div class="ts-content">
                         <!-- slug -->
                         <div class="ts-text is-label">
                             <span class="ts-icon is-link-icon is-end-spaced"></span>
-                            {{ __ "postcreate_slug" }}
+                            {=tr('postcreate_slug')}
                         </div>
                         <div class="ts-input has-top-spaced">
                             <input type="text" name="slug" required x-model="slug" x-on:blur="onSlugChange" />
@@ -205,23 +205,23 @@
                         <!-- excerpt -->
                         <div class="ts-text is-label has-top-spaced-large">
                             <span class="ts-icon is-quote-left-icon is-end-spaced"></span>
-                            {{ __ "postcreate_excerpt" }}
+                            {=tr('postcreate_excerpt')}
                         </div>
                         <div class="ts-input is-resizable has-top-spaced">
-                            <textarea name="excerpt" rows="5">{{ .Post.OriginalExcerpt }}</textarea>
+                            <textarea name="excerpt" rows="5">{=$ctx->Post->OriginalExcerpt}</textarea>
                         </div>
                         <!-- / excerpt -->
 
                         <!-- cover_file -->
                         <div class="ts-text is-label has-top-spaced-large">
                             <span class="ts-icon is-star-icon is-end-spaced"></span>
-                            {{ __ "postcreate_cover" }}
+                            {=tr('postcreate_cover')}
                         </div>
                         <div class="ts-box has-top-spaced" x-show="!cover_image_url">
                             <div class="ts-content is-interactive is-fitted" x-on:click="showCoverPicker">
                                 <div class="ts-blankslate is-secondary is-small">
                                     <span class="ts-icon is-image-icon"></span>
-                                    <div class="description">{{ __ "postcreate_cover_placeholder" }}</div>
+                                    <div class="description">{=tr('postcreate_cover_placeholder')}</div>
                                 </div>
                             </div>
                         </div>
@@ -247,15 +247,15 @@
                 <!-- others -->
                 <div class="ts-box has-top-spaced-large">
                     <div class="ts-content is-dense is-secondary">
-                        <div class="ts-text is-bold">{{ __ "postcreate_other" }}</div>
+                        <div class="ts-text is-bold">{=tr('postcreate_other')}</div>
                     </div>
                     <div class="ts-divider"></div>
                     <div class="ts-content">
                         <!-- is_pinned -->
                         <div class="ts-wrap is-vertical is-compact">
                             <label class="ts-checkbox">
-                                <input type="checkbox" name="is_pinned" value="true" {{ if .Post.PinnedAt }}checked{{ end }} />
-                                {{ __ "postcreate_pin" }}
+                                <input type="checkbox" name="is_pinned" value="true" {if $ctx->Post->PinnedAt}checked{/if} />
+                                {=tr('postcreate_pin')}
                             </label>
                         </div>
                         <!-- / is_pinned -->
@@ -269,15 +269,15 @@
 </form>
 
 <script type="module">
-import { initBlogmeCrepe } from "{{ .URL.RelativeRoot }}admin/assets/editor-crepe.js"
+import { initBlogmeCrepe } from "{=$ctx->URL->RelativeRoot}admin/assets/editor-crepe.js"
 
 initBlogmeCrepe({
     formSelector: "form[x-data='data']",
     contentSelector: "#content",
     holderSelector: "#block-editor",
     uploadUrl: "../photos/api",
-    csrfToken: "{{ .CSRF }}",
-    urlRoot: "{{ .URL.RelativeRoot }}",
+    csrfToken: "{=$ctx->CSRF}",
+    urlRoot: "{=$ctx->URL->RelativeRoot}",
 })
 </script>
 
@@ -288,7 +288,7 @@ initBlogmeCrepe({
  */
 
 const data = {
-    json_data: {{ .JSONData | html }},
+    json_data: {=$ctx->JSONData|html},
 
     onFileChange(e) {
         let file = e.target.files[0]

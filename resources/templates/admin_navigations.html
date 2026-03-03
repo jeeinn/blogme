@@ -1,20 +1,20 @@
 {{ define "content" }}
 <div id="content-container" class="ts-container has-vertically-padded-large has-bottom-padded-huge">
-    {{ if .Message }}
+    {if $ctx->Message}
     <div class="ts-notice has-bottom-spaced-large">
-        <div class="title">{{ __ "notice_title" }}</div>
-        <div class="content">{{ .Message }}</div>
+        <div class="title">{=tr('notice_title')}</div>
+        <div class="content">{=$ctx->Message}</div>
     </div>
-    {{ end }}
+    {/if}
 
-    <div class="ts-header">{{ __ "navigations_navigations" }}</div>
+    <div class="ts-header">{=tr('navigations_navigations')}</div>
     <div class="ts-box has-top-spaced">
         <form method="POST">
-            <input type="hidden" name="_csrf" value="{{ .CSRF }}" />
+            <input type="hidden" name="_csrf" value="{=$ctx->CSRF}" />
             <div class="ts-content is-vertically-padded">
                 <!-- name -->
                 <div class="ts-control">
-                    <div class="label">{{ __ "navigations_name" }}</div>
+                    <div class="label">{=tr('navigations_name')}</div>
                     <div class="content">
                         <div class="ts-input">
                             <input type="text" name="name" required />
@@ -25,7 +25,7 @@
 
                 <!-- url -->
                 <div class="ts-control has-top-spaced-large">
-                    <div class="label">{{ __ "navigations_url" }}</div>
+                    <div class="label">{=tr('navigations_url')}</div>
                     <div class="content">
                         <div class="ts-input">
                             <input type="url" name="url" required />
@@ -36,49 +36,49 @@
             </div>
             <div class="ts-divider"></div>
             <div class="ts-content is-dense is-secondary is-end-aligned">
-                <button type="submit" class="ts-button">{{ __ "button_create" }}</button>
+                <button type="submit" class="ts-button">{=tr('button_create')}</button>
             </div>
         </form>
     </div>
 
     <div class="ts-header has-top-spaced-big has-bottom-spaced">
-        {{ __ "navigations_list" }} {{ if len .Navigations }}
-        <span class="ts-badge is-start-spaced is-small">{{ len .Navigations }}</span>
-        {{ end }}
+        {=tr('navigations_list')} {if len($ctx->Navigations)}
+        <span class="ts-badge is-start-spaced is-small">{=len($ctx->Navigations)}</span>
+        {/if}
     </div>
-    {{ if not .Navigations }}
+    {if bool_not($ctx->Navigations)}
     <div class="ts-content is-tertiary is-vertically-very-padded">
-        <div class="ts-text is-center-aligned is-secondary">{{ __ "navigations_notfound" }}</div>
+        <div class="ts-text is-center-aligned is-secondary">{=tr('navigations_notfound')}</div>
     </div>
-    {{ else }}
+    {else}
     <div class="ts-box">
         <form action="navigations/edit" method="POST">
-            <input type="hidden" name="_csrf" value="{{ .CSRF }}" />
+            <input type="hidden" name="_csrf" value="{=$ctx->CSRF}" />
             <table class="ts-table is-celled">
                 <thead>
                     <tr>
-                        <th style="width: 30%">{{ __ "navigations_name" }}</th>
-                        <th>{{ __ "navigations_url" }}</th>
-                        <th style="width: 80px">{{ __ "navigations_order" }}</th>
+                        <th style="width: 30%">{=tr('navigations_name')}</th>
+                        <th>{=tr('navigations_url')}</th>
+                        <th style="width: 80px">{=tr('navigations_order')}</th>
                         <th class="is-collapsed"><span class="ts-icon is-trash-can-icon"></span></th>
                     </tr>
                 </thead>
                 <tbody>
-                    {{ range .Navigations }}
+                    {foreach $ctx->Navigations as $dot1}
                     <tr class="is-middle-aligned">
                         <td class="is-compact" style="width: 30%">
                             <div class="ts-input">
-                                <input type="text" name="name[]" value="{{ .Name }}" required />
+                                <input type="text" name="name[]" value="{=$dot1->Name}" required />
                             </div>
                         </td>
                         <td class="is-compact">
                             <div class="ts-input">
-                                <input type="url" name="url[]" value="{{ .URL }}" required />
+                                <input type="url" name="url[]" value="{=$dot1->URL}" required />
                             </div>
                         </td>
                         <td class="is-compact" style="width: 100px">
                             <div class="ts-input">
-                                <input type="number" name="sequence[]" value="{{ .Sequence }}" required />
+                                <input type="number" name="sequence[]" value="{=$dot1->Sequence}" required />
                             </div>
                         </td>
                         <td class="is-compact is-middle-aligned is-center-aligned">
@@ -88,18 +88,18 @@
                             </label>
                         </td>
                     </tr>
-                    {{ end }}
+                    {/foreach}
                 </tbody>
             </table>
             <div class="ts-divider"></div>
             <div class="ts-content is-dense is-secondary">
                 <div class="ts-wrap is-end-aligned">
-                    <button type="submit" class="ts-button">{{ __ "button_savechanges" }}</button>
+                    <button type="submit" class="ts-button">{=tr('button_savechanges')}</button>
                 </div>
             </div>
         </form>
     </div>
-    {{ end }}
+    {/if}
 </div>
 
 <script>

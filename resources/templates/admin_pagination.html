@@ -1,29 +1,29 @@
 {{ define "pagination" }}
 <div class="ts-pagination is-secondary">
-    <a class="item is-back {{if eq .Pagination.CurrentPage 1 }}is-disabled{{ end }}" href="?{{ .Pagination.Query }}page={{ sub .Pagination.CurrentPage 1 }}"></a>
+    <a class="item is-back {if eq($ctx->Pagination->CurrentPage, 1)}is-disabled{/if}" href="?{=$ctx->Pagination->Query}page={=sub($ctx->Pagination->CurrentPage, 1)}"></a>
 
-    {{ if gt .Pagination.CurrentPage 3 }}
-        <a href="?{{ .Pagination.Query }}page=1" class="item">1</a>
-        {{ if gt .Pagination.CurrentPage 4 }}
+    {if gt($ctx->Pagination->CurrentPage, 3)}
+        <a href="?{=$ctx->Pagination->Query}page=1" class="item">1</a>
+        {if gt($ctx->Pagination->CurrentPage, 4)}
             <span class="item is-skipped"></span>
-        {{ end }}
-    {{ end }}
+        {/if}
+    {/if}
 
-    {{ range $i := (seq (max 1 (sub .Pagination.CurrentPage 2)) (min .Pagination.TotalPages (add .Pagination.CurrentPage 2))) }}
-        {{ if eq $i $.Pagination.CurrentPage }}
-            <a href="#!" class="item is-active">{{ $i }}</a>
-        {{ else }}
-            <a href="?{{ $.Pagination.Query }}page={{ $i }}" class="item">{{ $i }}</a>
-        {{ end }}
-    {{ end }}
+    {foreach seq(max(1, sub($ctx->Pagination->CurrentPage, 2)), min($ctx->Pagination->TotalPages, add($ctx->Pagination->CurrentPage, 2))) as $i}
+        {if eq($i, $ctx->Pagination->CurrentPage)}
+            <a href="#!" class="item is-active">{=$i}</a>
+        {else}
+            <a href="?{=$ctx->Pagination->Query}page={=$i}" class="item">{=$i}</a>
+        {/if}
+    {/foreach}
 
-    {{ if lt .Pagination.CurrentPage (sub .Pagination.TotalPages 2) }}
-        {{ if lt .Pagination.CurrentPage (sub .Pagination.TotalPages 3) }}
+    {if lt($ctx->Pagination->CurrentPage, sub($ctx->Pagination->TotalPages, 2))}
+        {if lt($ctx->Pagination->CurrentPage, sub($ctx->Pagination->TotalPages, 3))}
             <span class="item is-skipped"></span>
-        {{ end }}
-        <a href="?{{ .Pagination.Query }}page={{ .Pagination.TotalPages }}" class="item">{{ .Pagination.TotalPages }}</a>
-    {{ end }}
+        {/if}
+        <a href="?{=$ctx->Pagination->Query}page={=$ctx->Pagination->TotalPages}" class="item">{=$ctx->Pagination->TotalPages}</a>
+    {/if}
 
-    <a href="?{{ .Pagination.Query }}page={{ add .Pagination.CurrentPage 1 }}" class="item is-next {{if eq .Pagination.CurrentPage .Pagination.TotalPages }}is-disabled{{ end }}"></a>
+    <a href="?{=$ctx->Pagination->Query}page={=add($ctx->Pagination->CurrentPage, 1)}" class="item is-next {if eq($ctx->Pagination->CurrentPage, $ctx->Pagination->TotalPages)}is-disabled{/if}"></a>
 </div>
 {{ end }}

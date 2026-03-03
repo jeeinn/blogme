@@ -1,36 +1,36 @@
 {{ define "content" }}
 <div id="content-container" class="ts-container has-vertically-padded-large has-bottom-padded-huge">
-    {{ if .Message }}
+    {if $ctx->Message}
     <div class="ts-notice has-bottom-spaced-large">
-        <div class="title">{{ __ "notice_title" }}</div>
-        <div class="content">{{ .Message }}</div>
+        <div class="title">{=tr('notice_title')}</div>
+        <div class="content">{=$ctx->Message}</div>
     </div>
-    {{ end }}
+    {/if}
 
-    <div class="ts-header">{{ __ "appearances_appearances" }}</div>
+    <div class="ts-header">{=tr('appearances_appearances')}</div>
     <form method="POST">
-        <input type="hidden" name="_csrf" value="{{ .CSRF }}" />
+        <input type="hidden" name="_csrf" value="{=$ctx->CSRF}" />
         <div class="ts-box has-top-spaced">
             <div class="ts-content is-vertically-padded">
                 <!-- color_scheme -->
                 <div class="ts-control">
-                    <div class="label">{{ __ "appearances_colorscheme" }}</div>
+                    <div class="label">{=tr('appearances_colorscheme')}</div>
                     <div class="content is-padded">
                         <div class="ts-wrap is-vertical is-compact">
                             <label class="ts-radio">
-                                <input name="color_scheme" type="radio" value="light" {{ if eq .Config.ColorScheme "light" }}checked{{ end }} />
-                                {{ __ "appearances_colorscheme_light" }}
+                                <input name="color_scheme" type="radio" value="light" {if eq($ctx->Config->ColorScheme, 'light')}checked{/if} />
+                                {=tr('appearances_colorscheme_light')}
                             </label>
                             <label class="ts-radio">
-                                <input name="color_scheme" type="radio" value="dark" {{ if eq .Config.ColorScheme "dark" }}checked{{ end }} />
-                                {{ __ "appearances_colorscheme_dark" }}
+                                <input name="color_scheme" type="radio" value="dark" {if eq($ctx->Config->ColorScheme, 'dark')}checked{/if} />
+                                {=tr('appearances_colorscheme_dark')}
                             </label>
                             <label class="ts-radio">
-                                <input name="color_scheme" type="radio" value="" {{ if not .Config.ColorScheme }}checked{{ end }} />
-                                {{ __ "appearances_colorscheme_auto" }}
+                                <input name="color_scheme" type="radio" value="" {if bool_not($ctx->Config->ColorScheme)}checked{/if} />
+                                {=tr('appearances_colorscheme_auto')}
                             </label>
                             <div class="ts-text is-description">
-                                {{ __ "appearances_colorscheme_description" }}
+                                {=tr('appearances_colorscheme_description')}
                             </div>
                         </div>
                     </div>
@@ -39,23 +39,23 @@
 
                 <!-- container_width -->
                 <div class="ts-control has-top-spaced-large">
-                    <div class="label">{{ __ "appearances_containerwidth" }}</div>
+                    <div class="label">{=tr('appearances_containerwidth')}</div>
                     <div class="content is-padded">
                         <div class="ts-wrap is-vertical is-compact">
                             <label class="ts-radio">
-                                <input name="container_width" type="radio" value="small" {{ if eq .Config.ContainerWidth "small" }}checked{{ end }} />
-                                {{ __ "appearances_containerwidth_small" }}
+                                <input name="container_width" type="radio" value="small" {if eq($ctx->Config->ContainerWidth, 'small')}checked{/if} />
+                                {=tr('appearances_containerwidth_small')}
                             </label>
                             <label class="ts-radio">
-                                <input name="container_width" type="radio" value="medium" {{ if eq .Config.ContainerWidth "medium" }}checked{{ end }} />
-                                {{ __ "appearances_containerwidth_medium" }}
+                                <input name="container_width" type="radio" value="medium" {if eq($ctx->Config->ContainerWidth, 'medium')}checked{/if} />
+                                {=tr('appearances_containerwidth_medium')}
                             </label>
                             <label class="ts-radio">
-                                <input name="container_width" type="radio" value="large" {{ if eq .Config.ContainerWidth "large" }}checked{{ end }} />
-                                {{ __ "appearances_containerwidth_large" }}
+                                <input name="container_width" type="radio" value="large" {if eq($ctx->Config->ContainerWidth, 'large')}checked{/if} />
+                                {=tr('appearances_containerwidth_large')}
                             </label>
                             <div class="ts-text is-description">
-                                {{ __ "appearances_containerwidth_description" }}
+                                {=tr('appearances_containerwidth_description')}
                             </div>
                         </div>
                     </div>
@@ -64,19 +64,19 @@
 
                 <!-- font_family -->
                 <div class="ts-control has-top-spaced-large">
-                    <div class="label">{{ __ "appearances_fontfamily" }}</div>
+                    <div class="label">{=tr('appearances_fontfamily')}</div>
                     <div class="content is-padded">
                         <div class="ts-wrap is-vertical is-compact">
                             <label class="ts-radio">
-                                <input name="font_family" type="radio" value="sans" {{ if eq .Config.FontFamily "sans" }}checked{{ end }} />
-                                {{ __ "appearances_fontfamily_sans" }}
+                                <input name="font_family" type="radio" value="sans" {if eq($ctx->Config->FontFamily, 'sans')}checked{/if} />
+                                {=tr('appearances_fontfamily_sans')}
                             </label>
                             <label class="ts-radio">
-                                <input name="font_family" type="radio" value="serif" {{ if eq .Config.FontFamily "serif" }}checked{{ end }} />
-                                {{ __ "appearances_fontfamily_serif" }}
+                                <input name="font_family" type="radio" value="serif" {if eq($ctx->Config->FontFamily, 'serif')}checked{/if} />
+                                {=tr('appearances_fontfamily_serif')}
                             </label>
                             <div class="ts-text is-description">
-                                {{ __ "appearances_fontfamily_description" }}
+                                {=tr('appearances_fontfamily_description')}
                             </div>
                         </div>
                     </div>
@@ -85,23 +85,23 @@
 
                 <!-- font_size -->
                 <div class="ts-control has-top-spaced-large">
-                    <div class="label">{{ __ "appearances_fontsize" }}</div>
+                    <div class="label">{=tr('appearances_fontsize')}</div>
                     <div class="content is-padded">
                         <div class="ts-wrap is-vertical is-compact">
                             <label class="ts-radio">
-                                <input name="font_size" type="radio" value="small" {{ if eq .Config.FontSize "small" }}checked{{ end }} />
-                                {{ __ "appearances_fontsize_small" }}
+                                <input name="font_size" type="radio" value="small" {if eq($ctx->Config->FontSize, 'small')}checked{/if} />
+                                {=tr('appearances_fontsize_small')}
                             </label>
                             <label class="ts-radio">
-                                <input name="font_size" type="radio" value="medium" {{ if eq .Config.FontSize "medium" }}checked{{ end }} />
-                                {{ __ "appearances_fontsize_medium" }}
+                                <input name="font_size" type="radio" value="medium" {if eq($ctx->Config->FontSize, 'medium')}checked{/if} />
+                                {=tr('appearances_fontsize_medium')}
                             </label>
                             <label class="ts-radio">
-                                <input name="font_size" type="radio" value="large" {{ if eq .Config.FontSize "large" }}checked{{ end }} />
-                                {{ __ "appearances_fontsize_large" }}
+                                <input name="font_size" type="radio" value="large" {if eq($ctx->Config->FontSize, 'large')}checked{/if} />
+                                {=tr('appearances_fontsize_large')}
                             </label>
                             <div class="ts-text is-description">
-                                {{ __ "appearances_fontsize_description" }}
+                                {=tr('appearances_fontsize_description')}
                             </div>
                         </div>
                     </div>
@@ -110,19 +110,19 @@
 
                 <!-- highlight_js -->
                 <div class="ts-control has-top-spaced-large">
-                    <div class="label">{{ __ "appearances_highlightjs" }}</div>
+                    <div class="label">{=tr('appearances_highlightjs')}</div>
                     <div class="content is-padded">
                         <div class="ts-wrap is-vertical is-compact">
                             <label class="ts-radio">
-                                <input name="highlight_js" type="radio" value="true" {{ if .Config.HighlightJS }}checked{{ end }} />
-                                {{ __ "appearances_highlightjs_true" }}
+                                <input name="highlight_js" type="radio" value="true" {if $ctx->Config->HighlightJS}checked{/if} />
+                                {=tr('appearances_highlightjs_true')}
                             </label>
                             <label class="ts-radio">
-                                <input name="highlight_js" type="radio" value="false" {{ if not .Config.HighlightJS }}checked{{ end }} />
-                                {{ __ "appearances_highlightjs_false" }}
+                                <input name="highlight_js" type="radio" value="false" {if bool_not($ctx->Config->HighlightJS)}checked{/if} />
+                                {=tr('appearances_highlightjs_false')}
                             </label>
                             <div class="ts-text is-description">
-                                {{ __ "appearances_highlightjs_description" }}
+                                {=tr('appearances_highlightjs_description')}
                             </div>
                         </div>
                     </div>
@@ -131,23 +131,23 @@
 
                 <!-- author_block -->
                 <div class="ts-control has-top-spaced-large">
-                    <div class="label">{{ __ "appearances_authorblock" }}</div>
+                    <div class="label">{=tr('appearances_authorblock')}</div>
                     <div class="content is-padded">
                         <div class="ts-wrap is-vertical is-compact">
                             <label class="ts-radio">
-                                <input name="author_block" type="radio" value="start" {{ if eq .Config.AuthorBlock "start" }}checked{{ end }} />
-                                {{ __ "appearances_authorblock_start" }}
+                                <input name="author_block" type="radio" value="start" {if eq($ctx->Config->AuthorBlock, 'start')}checked{/if} />
+                                {=tr('appearances_authorblock_start')}
                             </label>
                             <label class="ts-radio">
-                                <input name="author_block" type="radio" value="end" {{ if eq .Config.AuthorBlock "end" }}checked{{ end }} />
-                                {{ __ "appearances_authorblock_end" }}
+                                <input name="author_block" type="radio" value="end" {if eq($ctx->Config->AuthorBlock, 'end')}checked{/if} />
+                                {=tr('appearances_authorblock_end')}
                             </label>
                             <label class="ts-radio">
-                                <input name="author_block" type="radio" value="none" {{ if eq .Config.AuthorBlock "none" }}checked{{ end }} />
-                                {{ __ "appearances_authorblock_none" }}
+                                <input name="author_block" type="radio" value="none" {if eq($ctx->Config->AuthorBlock, 'none')}checked{/if} />
+                                {=tr('appearances_authorblock_none')}
                             </label>
                             <div class="ts-text is-description">
-                                {{ __ "appearances_authorblock_description" }}
+                                {=tr('appearances_authorblock_description')}
                             </div>
                         </div>
                     </div>
@@ -156,13 +156,13 @@
 
                 <!-- posts_per_page -->
                 <div class="ts-control has-top-spaced-large">
-                    <div class="label">{{ __ "appearances_postsperpage" }}</div>
+                    <div class="label">{=tr('appearances_postsperpage')}</div>
                     <div class="content">
                         <div class="ts-input">
-                            <input name="posts_per_page" type="number" value="{{ .Config.PostsPerPage }}" required />
+                            <input name="posts_per_page" type="number" value="{=$ctx->Config->PostsPerPage}" required />
                         </div>
                         <div class="ts-text is-description has-top-spaced-small">
-                            {{ __ "appearances_postsperpage_description" }}
+                            {=tr('appearances_postsperpage_description')}
                         </div>
                     </div>
                 </div>
@@ -170,13 +170,13 @@
 
                 <!-- footer_text -->
                 <div class="ts-control has-top-spaced-large">
-                    <div class="label">{{ __ "appearances_footertext" }}</div>
+                    <div class="label">{=tr('appearances_footertext')}</div>
                     <div class="content">
                         <div class="ts-input is-resizable">
-                            <textarea name="footer_text" rows="5">{{ .Config.FooterText }}</textarea>
+                            <textarea name="footer_text" rows="5">{=$ctx->Config->FooterText}</textarea>
                         </div>
                         <div class="ts-text is-description has-top-spaced-small">
-                            {{ __ "appearances_footertext_description" }}
+                            {=tr('appearances_footertext_description')}
                         </div>
                     </div>
                 </div>
@@ -184,17 +184,17 @@
 
                 <!-- themes -->
                 <div class="ts-control has-top-spaced-large">
-                    <div class="label">{{ __ "appearances_themes" }}</div>
+                    <div class="label">{=tr('appearances_themes')}</div>
                     <div class="content">
                         <div class="ts-select is-fluid">
                             <select name="theme">
-                                {{ range .Themes }}
-                                <option value="{{ . }}" {{ if eq $.Config.Theme . }}selected{{ end }}>{{ . }}</option>
-                                {{ end }}
+                                {foreach $ctx->Themes as $dot1}
+                                <option value="{=$dot1}" {if eq($ctx->Config->Theme, $dot1)}selected{/if}>{=$dot1}</option>
+                                {/foreach}
                             </select>
                         </div>
                         <div class="ts-text is-description has-top-spaced-small">
-                            {{ __ "appearances_themes_description" }}
+                            {=tr('appearances_themes_description')}
                         </div>
                     </div>
                 </div>
@@ -203,29 +203,29 @@
             <div class="ts-divider"></div>
             <div class="ts-content is-dense is-secondary">
                 <div class="ts-wrap is-end-aligned">
-                    <button type="submit" class="ts-button">{{ __ "button_savechanges" }}</button>
+                    <button type="submit" class="ts-button">{=tr('button_savechanges')}</button>
                 </div>
             </div>
         </div>
     </form>
 
-    <div class="ts-header has-top-spaced-big">{{ __ "appearances_injected" }}</div>
+    <div class="ts-header has-top-spaced-big">{=tr('appearances_injected')}</div>
     <div class="ts-text is-secondary has-top-spaced-small">
-        {{ __ "appearances_injected_description" }}
+        {=tr('appearances_injected_description')}
     </div>
     <form action="appearances/injected" method="POST">
-        <input type="hidden" name="_csrf" value="{{ .CSRF }}" />
+        <input type="hidden" name="_csrf" value="{=$ctx->CSRF}" />
         <div class="ts-box has-top-spaced">
             <div class="ts-content is-vertically-padded">
                 <!-- injected_head -->
                 <div class="ts-control">
-                    <div class="label">{{ __ "appearances_injectedhead" }}</div>
+                    <div class="label">{=tr('appearances_injectedhead')}</div>
                     <div class="content is-padded">
                         <div class="ts-input is-resizable">
-                            <textarea name="injected_head" rows="5">{{ .Config.InjectedHead }}</textarea>
+                            <textarea name="injected_head" rows="5">{=$ctx->Config->InjectedHead}</textarea>
                         </div>
                         <div class="ts-text is-description has-top-spaced-small">
-                            {{ __ "appearances_injectedhead_description" }}
+                            {=tr('appearances_injectedhead_description')}
                         </div>
                     </div>
                 </div>
@@ -233,13 +233,13 @@
 
                 <!-- injected_foot -->
                 <div class="ts-control has-top-spaced-large">
-                    <div class="label">{{ __ "appearances_injectedfoot" }}</div>
+                    <div class="label">{=tr('appearances_injectedfoot')}</div>
                     <div class="content">
                         <div class="ts-input is-resizable">
-                            <textarea name="injected_foot" rows="5">{{ .Config.InjectedFoot }}</textarea>
+                            <textarea name="injected_foot" rows="5">{=$ctx->Config->InjectedFoot}</textarea>
                         </div>
                         <div class="ts-text is-description has-top-spaced-small">
-                            {{ __ "appearances_injectedfoot_description" }}
+                            {=tr('appearances_injectedfoot_description')}
                         </div>
                     </div>
                 </div>
@@ -249,13 +249,13 @@
 
                 <!-- injected_post_start -->
                 <div class="ts-control">
-                    <div class="label">{{ __ "appearances_injectedpoststart" }}</div>
+                    <div class="label">{=tr('appearances_injectedpoststart')}</div>
                     <div class="content">
                         <div class="ts-input is-resizable">
-                            <textarea name="injected_post_start" rows="5">{{ .Config.InjectedPostStart }}</textarea>
+                            <textarea name="injected_post_start" rows="5">{=$ctx->Config->InjectedPostStart}</textarea>
                         </div>
                         <div class="ts-text is-description has-top-spaced-small">
-                            {{ __ "appearances_injectedpoststart_description" }}
+                            {=tr('appearances_injectedpoststart_description')}
                         </div>
                     </div>
                 </div>
@@ -263,13 +263,13 @@
 
                 <!-- injected_post_end -->
                 <div class="ts-control has-top-spaced-large">
-                    <div class="label">{{ __ "appearances_injectedpostend" }}</div>
+                    <div class="label">{=tr('appearances_injectedpostend')}</div>
                     <div class="content">
                         <div class="ts-input is-resizable">
-                            <textarea name="injected_post_end" rows="5">{{ .Config.InjectedPostEnd }}</textarea>
+                            <textarea name="injected_post_end" rows="5">{=$ctx->Config->InjectedPostEnd}</textarea>
                         </div>
                         <div class="ts-text is-description has-top-spaced-small">
-                            {{ __ "appearances_injectedpostend_description" }}
+                            {=tr('appearances_injectedpostend_description')}
                         </div>
                     </div>
                 </div>
@@ -278,7 +278,7 @@
             <div class="ts-divider"></div>
             <div class="ts-content is-dense is-secondary">
                 <div class="ts-wrap is-end-aligned">
-                    <button type="submit" class="ts-button">{{ __ "button_savechanges" }}</button>
+                    <button type="submit" class="ts-button">{=tr('button_savechanges')}</button>
                 </div>
             </div>
         </div>

@@ -2,53 +2,53 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8" />
-        <title>{{ _f "title_admin" .Config.Name }}</title>
-        <link rel="stylesheet" href="{{ .URL.RelativeRoot }}admin/assets/tocas.min.css" />
-        <script src="{{ .URL.RelativeRoot }}admin/assets/tocas.min.js" defer></script>
-        <link rel="stylesheet" href="{{ .URL.RelativeRoot }}admin/assets/style.css" />
-        <link rel="icon" type="image/png" href="{{ .URL.RelativeRoot }}assets/favicon.png">
+        <title>{=trf('title_admin', $ctx->Config->Name)}</title>
+        <link rel="stylesheet" href="{=$ctx->URL->RelativeRoot}admin/assets/tocas.min.css" />
+        <script src="{=$ctx->URL->RelativeRoot}admin/assets/tocas.min.js" defer></script>
+        <link rel="stylesheet" href="{=$ctx->URL->RelativeRoot}admin/assets/style.css" />
+        <link rel="icon" type="image/png" href="{=$ctx->URL->RelativeRoot}assets/favicon.png">
     </head>
     <body>
         <div class="ts-app-layout is-fullscreen is-horizontal">
             <div class="cell is-scrollable has-flex-column" style="width: 260px">
                 <div class="ts-content is-horizontally-padded">
-                    <a href="{{ .URL.RelativeRoot }}" target="_blank" class="ts-header is-big is-heavy">{{ .Config.Name }}</a>
-                    <div class="ts-text is-description is-heavy has-top-spaced-small">{{ _f "sidebar_currentrole" .Self.Nickname }}</div>
-                    <a href="{{ .URL.RelativeRoot }}admin/post/create" class="ts-button is-start-icon is-outlined has-top-spaced">
+                    <a href="{=$ctx->URL->RelativeRoot}" target="_blank" class="ts-header is-big is-heavy">{=$ctx->Config->Name}</a>
+                    <div class="ts-text is-description is-heavy has-top-spaced-small">{=trf('sidebar_currentrole', $ctx->Self->Nickname)}</div>
+                    <a href="{=$ctx->URL->RelativeRoot}admin/post/create" class="ts-button is-start-icon is-outlined has-top-spaced">
                         <span class="ts-icon is-square-plus-icon"></span>
-                        {{ __ "button_createpost" }}
+                        {=tr('button_createpost')}
                     </a>
                 </div>
                 <div class="ts-app-sidebar">
-                    <div class="header">{{ __ "sidebar_account" }}</div>
-                    <a href="{{ .URL.RelativeRoot }}admin/users" class="item {{ if eq .URL.PageType "user" }}is-active{{ end }}">
-                        <span class="ts-icon is-user-icon"></span>{{ __ "sidebar_users" }}
+                    <div class="header">{=tr('sidebar_account')}</div>
+                    <a href="{=$ctx->URL->RelativeRoot}admin/users" class="item {if eq($ctx->URL->PageType, 'user')}is-active{/if}">
+                        <span class="ts-icon is-user-icon"></span>{=tr('sidebar_users')}
                     </a>
-                    <div class="header">{{ __ "sidebar_content" }}</div>
-                    <a href="{{ .URL.RelativeRoot }}admin/posts" class="item {{ if eq .URL.PageType "post" }}is-active{{ end }}">
-                        <span class="ts-icon is-newspaper-icon"></span>{{ __ "sidebar_posts" }}
+                    <div class="header">{=tr('sidebar_content')}</div>
+                    <a href="{=$ctx->URL->RelativeRoot}admin/posts" class="item {if eq($ctx->URL->PageType, 'post')}is-active{/if}">
+                        <span class="ts-icon is-newspaper-icon"></span>{=tr('sidebar_posts')}
                     </a>
-                    <a href="{{ .URL.RelativeRoot }}admin/tags" class="item {{ if eq .URL.PageType "tag" }}is-active{{ end }}">
-                        <span class="ts-icon is-tags-icon"></span>{{ __ "sidebar_tags" }}
+                    <a href="{=$ctx->URL->RelativeRoot}admin/tags" class="item {if eq($ctx->URL->PageType, 'tag')}is-active{/if}">
+                        <span class="ts-icon is-tags-icon"></span>{=tr('sidebar_tags')}
                     </a>
-                    <a href="{{ .URL.RelativeRoot }}admin/photos" class="item {{ if eq .URL.PageType "media" }}is-active{{ end }}">
-                        <span class="ts-icon is-photo-film-icon"></span>{{ __ "sidebar_media" }}
+                    <a href="{=$ctx->URL->RelativeRoot}admin/photos" class="item {if eq($ctx->URL->PageType, 'media')}is-active{/if}">
+                        <span class="ts-icon is-photo-film-icon"></span>{=tr('sidebar_media')}
                     </a>
-                    <a href="{{ .URL.RelativeRoot }}admin/navigations" class="item {{ if eq .URL.PageType "navigation" }}is-active{{ end }}">
-                        <span class="ts-icon is-link-icon"></span>{{ __ "sidebar_navigations" }}
+                    <a href="{=$ctx->URL->RelativeRoot}admin/navigations" class="item {if eq($ctx->URL->PageType, 'navigation')}is-active{/if}">
+                        <span class="ts-icon is-link-icon"></span>{=tr('sidebar_navigations')}
                     </a>
-                    <div class="header">{{ __ "sidebar_system" }}</div>
-                    <a href="{{ .URL.RelativeRoot }}admin/settings" class="item {{ if eq .URL.PageType "settings" }}is-active{{ end }}">
-                        <span class="ts-icon is-gear-icon"></span>{{ __ "sidebar_settings" }}
+                    <div class="header">{=tr('sidebar_system')}</div>
+                    <a href="{=$ctx->URL->RelativeRoot}admin/settings" class="item {if eq($ctx->URL->PageType, 'settings')}is-active{/if}">
+                        <span class="ts-icon is-gear-icon"></span>{=tr('sidebar_settings')}
                     </a>
-                    <a href="{{ .URL.RelativeRoot }}admin/appearances" class="item {{ if eq .URL.PageType "appearances" }}is-active{{ end }}">
-                        <span class="ts-icon is-palette-icon"></span>{{ __ "sidebar_appearances" }}
+                    <a href="{=$ctx->URL->RelativeRoot}admin/appearances" class="item {if eq($ctx->URL->PageType, 'appearances')}is-active{/if}">
+                        <span class="ts-icon is-palette-icon"></span>{=tr('sidebar_appearances')}
                     </a>
                 </div>
                 <div class="ts-content has-top-spaced-auto">
-                    <form action="{{ .URL.RelativeRoot }}admin/logout" method="POST">
-                        <input type="hidden" name="_csrf" value="{{ .CSRF }}" />
-                        <button type="submit" class="ts-button is-outlined is-fluid">{{ __ "button_logout" }}</button>
+                    <form action="{=$ctx->URL->RelativeRoot}admin/logout" method="POST">
+                        <input type="hidden" name="_csrf" value="{=$ctx->CSRF}" />
+                        <button type="submit" class="ts-button is-outlined is-fluid">{=tr('button_logout')}</button>
                     </form>
                 </div>
             </div>

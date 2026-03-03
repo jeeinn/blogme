@@ -3,11 +3,11 @@
     <head>
         <meta charset="UTF-8" />
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-        <link rel="stylesheet" href="{{ .URL.RelativeRoot }}admin/assets/tocas.min.css" />
-        <script src="{{ .URL.RelativeRoot }}admin/assets/tocas.min.js"></script>
+        <link rel="stylesheet" href="{=$ctx->URL->RelativeRoot}admin/assets/tocas.min.css" />
+        <script src="{=$ctx->URL->RelativeRoot}admin/assets/tocas.min.js"></script>
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-        <link rel="icon" type="image/png" href="{{ .URL.RelativeRoot }}assets/favicon.png">
-        <title>{{ .Name }}</title>
+        <link rel="icon" type="image/png" href="{=$ctx->URL->RelativeRoot}assets/favicon.png">
+        <title>{=$ctx->Name}</title>
         <style>
             body {
                 font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", "Noto Sans JP", "Noto Sans KR", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
@@ -22,28 +22,28 @@
     </head>
     <body>
         <form method="POST">
-            <input type="hidden" name="_csrf" value="{{ .CSRF }}" />
+            <input type="hidden" name="_csrf" value="{=$ctx->CSRF}" />
             <div class="ts-app-center">
                 <div class="content">
                     <div class="ts-header is-large is-heavy is-icon">
                         <div class="ts-icon is-fish-icon"></div>
-                        <a class="ts-text is-undecorated" href="{{ .URL.RelativeRoot }}">{{ .Name }}</a>
+                        <a class="ts-text is-undecorated" href="{=$ctx->URL->RelativeRoot}">{=$ctx->Name}</a>
                     </div>
                     <div class="has-top-spaced-large" style="width: 280px">
-                        {{ if .Message }}
+                        {if $ctx->Message}
                         <div class="ts-notice is-negative has-bottom-spaced">
-                            <div class="content">{{ .Message }}</div>
+                            <div class="content">{=$ctx->Message}</div>
                         </div>
-                        {{ end }}
+                        {/if}
                         <div class="ts-box">
                             <div class="ts-content is-padded">
                                 <div class="ts-wrap is-vertical">
-                                    <div class="ts-text is-label">{{ __ "users_email" }}</div>
+                                    <div class="ts-text is-label">{=tr('users_email')}</div>
                                     <div class="ts-input is-start-icon">
                                         <span class="ts-icon is-user-icon"></span>
                                         <input type="email" name="email" required />
                                     </div>
-                                    <div class="ts-text is-label">{{ __ "users_password" }}</div>
+                                    <div class="ts-text is-label">{=tr('users_password')}</div>
                                     <div class="ts-input is-start-icon">
                                         <span class="ts-icon is-lock-icon"></span>
                                         <input type="password" name="password" required />
@@ -51,10 +51,10 @@
                                     <div></div>
                                     <div class="ts-grid">
                                         <div class="column">
-                                            <a href="{{ .URL.RelativeRoot }}" class="ts-button is-ghost">{{ __ "button_back" }}</a>
+                                            <a href="{=$ctx->URL->RelativeRoot}" class="ts-button is-ghost">{=tr('button_back')}</a>
                                         </div>
                                         <div class="column is-fluid">
-                                            <button type="submit" class="ts-button is-fluid">{{ __ "button_login" }}</button>
+                                            <button type="submit" class="ts-button is-fluid">{=tr('button_login')}</button>
                                         </div>
                                     </div>
                                 </div>

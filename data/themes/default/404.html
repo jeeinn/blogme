@@ -1,48 +1,48 @@
 <!DOCTYPE html>
-<html class="{{ if .Config.ContainerWidth }}container-{{ .Config.ContainerWidth }}{{ end }} text-{{ .Config.FontSize }} font-{{ .Config.FontFamily }} {{ if .Config.ColorScheme }}is-{{ .Config.ColorScheme }}{{ end }}">
+<html class="{if $ctx->Config->ContainerWidth}container-{=$ctx->Config->ContainerWidth}{/if} text-{=$ctx->Config->FontSize} font-{=$ctx->Config->FontFamily} {if $ctx->Config->ColorScheme}is-{=$ctx->Config->ColorScheme}{/if}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ .Config.Name }}</title>
-    <meta name="description" content="{{ .Config.Description }}">
+    <title>{=$ctx->Config->Name}</title>
+    <meta name="description" content="{=$ctx->Config->Description}">
     <!-- og -->
-    <meta property="og:site_name" content="{{ .Config.Name }}" />
-    <meta property="og:url" content="{{ .URL.Absolute }}" />
-    <meta property="og:description" content="{{ .Config.Description }}" />
+    <meta property="og:site_name" content="{=$ctx->Config->Name}" />
+    <meta property="og:url" content="{=$ctx->URL->Absolute}" />
+    <meta property="og:description" content="{=$ctx->Config->Description}" />
     <!-- / og -->
-    <link rel="stylesheet" href="{{ .URL.AbsoluteHost }}assets/tocas.min.css" />
-    <script src="{{ .URL.AbsoluteHost }}assets/tocas.min.js"></script>
+    <link rel="stylesheet" href="{=$ctx->URL->AbsoluteHost}assets/tocas.min.css" />
+    <script src="{=$ctx->URL->AbsoluteHost}assets/tocas.min.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-    <link rel="stylesheet" href="{{ .URL.AbsoluteHost }}assets/style.css" />
-    <link rel="icon" type="image/png" href="{{ .URL.AbsoluteHost }}assets/favicon.png">
-    {{ .Config.InjectedHead | html }}
+    <link rel="stylesheet" href="{=$ctx->URL->AbsoluteHost}assets/style.css" />
+    <link rel="icon" type="image/png" href="{=$ctx->URL->AbsoluteHost}assets/favicon.png">
+    {=$ctx->Config->InjectedHead|html}
 </head>
 <body id="page">
     <!-- content -->
     <div id="page-content" class="tablet+:has-bottom-padded-huge mobile:has-bottom-padded-large">
         <!-- navigations -->
-        {{ if .Navigations }}
+        {if $ctx->Navigations}
         <div class="ts-content is-tertiary is-fitted">
             <div class="ts-container">
                 <div id="index-navigation">
-                    {{ range .Navigations }}
-                    <a href="{{ .URL }}" class="navigation-item">{{ .Name }}</a>
-                    {{ end }}
+                    {foreach $ctx->Navigations as $dot1}
+                    <a href="{=$dot1->URL}" class="navigation-item">{=$dot1->Name}</a>
+                    {/foreach}
                 </div>
             </div>
         </div>
         <div class="ts-divider"></div>
-        {{ end }}
+        {/if}
         <!-- / navigations -->
 
         <!-- slate -->
         <div class="ts-content is-secondary is-horizontally-fitted tablet+:has-vertically-padded-huge mobile:has-vertically-padded-big">
             <div class="ts-container">
-                <a href="{{ .URL.AbsoluteHost }}" class="ts-header is-heavy is-center-aligned tablet+:is-massive mobile:is-big">
-                    {{ .Config.Name }}
+                <a href="{=$ctx->URL->AbsoluteHost}" class="ts-header is-heavy is-center-aligned tablet+:is-massive mobile:is-big">
+                    {=$ctx->Config->Name}
                 </a>
                 <div class="ts-text is-center-aligned is-secondary has-top-spaced">
-                    {{ .Config.Description }}
+                    {=$ctx->Config->Description}
                 </div>
             </div>
         </div>
@@ -53,10 +53,10 @@
         <!-- blankslate -->
         <div class="ts-blankslate is-narrow">
             <span class="ts-icon is-ghost-icon"></span>
-            <div class="header">{{ __ "404_title" }}</div>
-            <div class="description">{{ __ "404_description" }}</div>
+            <div class="header">{=tr('404_title')}</div>
+            <div class="description">{=tr('404_description')}</div>
             <div class="action">
-                <a href="{{ .URL.AbsoluteHost }}" class="ts-button">{{ __ "button_returnhomepage" }}</a>
+                <a href="{=$ctx->URL->AbsoluteHost}" class="ts-button">{=tr('button_returnhomepage')}</a>
             </div>
         </div>
         <!-- / blankslate -->
@@ -64,13 +64,13 @@
     <!-- / content -->
 
     <!-- footer -->
-    {{ if .Config.FooterText }}
+    {if $ctx->Config->FooterText}
     <div id="page-footer" class="ts-content is-horizontally-fitted">
-        <div class="ts-container">{{ .Config.FooterText | html }}</div>
+        <div class="ts-container">{=$ctx->Config->FooterText|html}</div>
     </div>
-    {{ end }}
+    {/if}
     <!-- / footer -->
 
-    {{ .Config.InjectedFoot | html }}
+    {=$ctx->Config->InjectedFoot|html}
 </body>
 </html>

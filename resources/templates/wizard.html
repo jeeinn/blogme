@@ -3,10 +3,10 @@
     <head>
         <meta charset="UTF-8" />
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-        <link rel="stylesheet" href="{{ .URL.RelativeRoot }}admin/assets/tocas.min.css" />
-        <script src="{{ .URL.RelativeRoot }}admin/assets/tocas.min.js"></script>
+        <link rel="stylesheet" href="{=$ctx->URL->RelativeRoot}admin/assets/tocas.min.css" />
+        <script src="{=$ctx->URL->RelativeRoot}admin/assets/tocas.min.js"></script>
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-        <link rel="icon" type="image/png" href="{{ .URL.RelativeRoot }}assets/favicon.png">
+        <link rel="icon" type="image/png" href="{=$ctx->URL->RelativeRoot}assets/favicon.png">
         <title>Tunalog</title>
         <style>
             html, body {
@@ -24,34 +24,34 @@
     </head>
     <body>
         <form method="POST">
-            <input type="hidden" name="_csrf" value="{{ .CSRF }}" />
+            <input type="hidden" name="_csrf" value="{=$ctx->CSRF}" />
             <div class="has-flex-column" style="height: 100vh">
                 <div class="ts-content is-tertiary is-vertically-very-padded">
                     <div class="ts-container is-very-narrow">
-                        <div class="ts-header is-big is-heavy">{{ __ "wizard_welcome" }}</div>
-                        <div class="ts-text is-secondary">{{ __ "wizard_description" }}</div>
+                        <div class="ts-header is-big is-heavy">{=tr('wizard_welcome')}</div>
+                        <div class="ts-text is-secondary">{=tr('wizard_description')}</div>
                     </div>
                 </div>
                 <div class="ts-divider"></div>
                 <div class="has-flex-1">
                     <div class="ts-container is-very-narrow has-vertically-spaced-big">
-                        {{ if .Message }}
+                        {if $ctx->Message}
                         <div class="ts-notice is-negative has-bottom-spaced">
-                            <div class="content">{{ .Message }}</div>
+                            <div class="content">{=$ctx->Message}</div>
                         </div>
-                        {{ end }}
-                        <div class="ts-header is-large">{{ __ "wizard_settings" }}</div>
-                        <div class="ts-text is-secondary">{{ __ "wizard_settings_description" }}</div>
+                        {/if}
+                        <div class="ts-header is-large">{=tr('wizard_settings')}</div>
+                        <div class="ts-text is-secondary">{=tr('wizard_settings_description')}</div>
                         <div class="ts-content is-rounded is-secondary tablet+:has-padded-big has-top-spaced-large">
                             <!-- locale -->
                             <div class="ts-control is-wide mobile:is-stacked">
-                                <div class="label">{{ __ "settings_locale" }}</div>
+                                <div class="label">{=tr('settings_locale')}</div>
                                 <div class="content">
                                     <div class="ts-select" style="min-width: 260px">
                                         <select id="locale-input" name="locale">
-                                            {{ range $k, $v := .Locales }}
-                                            <option value="{{ $v }}" {{ if eq $.DefaultLocale $v }}selected{{ end }}>{{ $k }}</option>
-                                            {{ end }}
+                                            {foreach $ctx->Locales as $k => $v}
+                                            <option value="{=$v}" {if eq($ctx->DefaultLocale, $v)}selected{/if}>{=$k}</option>
+                                            {/foreach}
                                         </select>
                                     </div>
                                 </div>
@@ -62,10 +62,10 @@
 
                             <!-- name -->
                             <div class="ts-control is-wide mobile:is-stacked has-top-spaced-large">
-                                <div class="label">{{ __ "settings_name" }}</div>
+                                <div class="label">{=tr('settings_name')}</div>
                                 <div class="content">
                                     <div class="ts-input">
-                                        <input type="text" name="name" value="{{ __ "wizard_name_value" }}" required />
+                                        <input type="text" name="name" value="{=tr('wizard_name_value')}" required />
                                     </div>
                                 </div>
                             </div>
@@ -73,10 +73,10 @@
 
                             <!-- description -->
                             <div class="ts-control is-wide mobile:is-stacked has-top-spaced-large">
-                                <div class="label">{{ __ "settings_slogan" }}</div>
+                                <div class="label">{=tr('settings_slogan')}</div>
                                 <div class="content">
-                                    <div class="ts-input"><input type="text" name="description" value="{{ __ "wizard_slogan_value" }}" /></div>
-                                    <div class="ts-text is-description has-top-spaced-small">{{ __ "wizard_slogan_description" }}</div>
+                                    <div class="ts-input"><input type="text" name="description" value="{=tr('wizard_slogan_value')}" /></div>
+                                    <div class="ts-text is-description has-top-spaced-small">{=tr('wizard_slogan_description')}</div>
                                 </div>
                             </div>
                             <!-- description -->
@@ -85,12 +85,12 @@
                             <input type="hidden" id="timezone-input" name="timezone" value="" />
                             <!-- / timezone -->
                         </div>
-                        <div class="ts-header is-large has-top-spaced-big">{{ __ "wizard_admin" }}</div>
-                        <div class="ts-text is-secondary">{{ __ "wizard_admin_description" }}</div>
+                        <div class="ts-header is-large has-top-spaced-big">{=tr('wizard_admin')}</div>
+                        <div class="ts-text is-secondary">{=tr('wizard_admin_description')}</div>
                         <div class="ts-content is-rounded is-secondary tablet+:has-padded-big has-top-spaced-large">
                             <!-- email -->
                             <div class="ts-control is-wide mobile:is-stacked">
-                                <div class="label">{{ __ "users_email" }}</div>
+                                <div class="label">{=tr('users_email')}</div>
                                 <div class="content">
                                     <div class="ts-input">
                                         <input type="text" name="email" value="admin@example.com" required />
@@ -101,24 +101,24 @@
 
                             <!-- nickname -->
                             <div class="ts-control is-wide mobile:is-stacked has-top-spaced-large">
-                                <div class="label">{{ __ "users_nickname" }}</div>
+                                <div class="label">{=tr('users_nickname')}</div>
                                 <div class="content">
                                     <div class="ts-input">
                                         <input type="text" name="nickname" value="Admin" required />
                                     </div>
-                                    <div class="ts-text is-description has-top-spaced-small">{{ __ "wizard_nickname_description" }}</div>
+                                    <div class="ts-text is-description has-top-spaced-small">{=tr('wizard_nickname_description')}</div>
                                 </div>
                             </div>
                             <!-- / nickname -->
 
                             <!-- password -->
                             <div class="ts-control is-wide mobile:is-stacked has-top-spaced-large">
-                                <div class="label">{{ __ "users_password" }}</div>
+                                <div class="label">{=tr('users_password')}</div>
                                 <div class="content">
                                     <div class="ts-input">
                                         <input type="password" name="password" value="admin" required />
                                     </div>
-                                    <div class="ts-text is-description has-top-spaced-small">{{ __ "wizard_password_description" }}</div>
+                                    <div class="ts-text is-description has-top-spaced-small">{=tr('wizard_password_description')}</div>
                                 </div>
                             </div>
                             <!-- / password -->
@@ -130,7 +130,7 @@
                     <div class="ts-container is-very-narrow">
                         <button type="submit" class="ts-button is-start-labeled-icon">
                             <span class="ts-icon is-rocket-icon"></span>
-                            {{ __ "button_finishwizard" }}
+                            {=tr('button_finishwizard')}
                         </button>
                     </div>
                 </div>
