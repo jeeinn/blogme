@@ -311,12 +311,21 @@ final class App
             $this->serveFile($this->root . '/public/uploads/' . substr($path, strlen('/post/uploads/')), $this->root . '/public/uploads');
             return true;
         }
-        if (str_starts_with($path, '/admin/assets/')) {
-            $file = $this->root . '/resources/admin_assets/' . basename($path);
-            if (is_file($file)) {
-                $this->outputFile($file);
-                return true;
+        if (str_starts_with($path, '/assets/')) {
+            $theme = 'default';
+            if ($this->configExists()) {
+                $theme = (string) (($this->config() ?? [])['Theme'] ?? 'default');
             }
+            $relative = substr($path, strlen('/assets/'));
+            $base = $this->root . '/data/themes/' . $theme . '/assets';
+            $this->serveFile($base . '/' . $relative, $base);
+            return true;
+        }
+        if (str_starts_with($path, '/admin/assets/')) {
+            $relative = substr($path, strlen('/admin/assets/'));
+            $base = $this->root . '/resources/admin_assets';
+            $this->serveFile($base . '/' . $relative, $base);
+            return true;
         }
         if (str_starts_with($path, '/admin/uploads/')) {
             $relative = substr($path, strlen('/admin/uploads/'));
@@ -368,6 +377,11 @@ final class App
                 'jpeg' => 'image/jpeg',
                 'gif' => 'image/gif',
                 'webp' => 'image/webp',
+                'woff2' => 'font/woff2',
+                'woff' => 'font/woff',
+                'ttf' => 'font/ttf',
+                'otf' => 'font/otf',
+                'eot' => 'application/vnd.ms-fontobject',
             ];
             if (isset($mimeMap[$ext])) {
                 $mime = $mimeMap[$ext];
