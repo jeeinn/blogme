@@ -1,0 +1,71 @@
+name: Build And Release
+
+on:
+  push:
+    tags:
+      - "v*"
+      - "release-*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.2"
+          tools: composer:v2
+          coverage: none
+
+      - name: Install production dependencies
+        run: composer install --no-dev --prefer-dist --no-progress --optimize-autoloader
+
+      - name: Prepare distributable
+        shell: bash
+        run: |
+          set -euo pipefail
+          TAG="${GITHUB_REF_NAME}"
+          PACKAGE_NAME="blogme-${TAG}"
+          DIST_ROOT="${RUNNER_TEMP}/${PACKAGE_NAME}"
+
+          mkdir -p "${DIST_ROOT}"
+
+          cp -a app "${DIST_ROOT}/"
+          cp -a bootstrap "${DIST_ROOT}/"
+          cp -a config "${DIST_ROOT}/"
+          cp -a data "${DIST_ROOT}/"
+          cp -a public "${DIST_ROOT}/"
+          cp -a resources "${DIST_ROOT}/"
+          cp -a storage "${DIST_ROOT}/"
+          cp -a vendor "${DIST_ROOT}/"
+          cp -a cli.php "${DIST_ROOT}/"
+          cp -a composer.json "${DIST_ROOT}/"
+          cp -a composer.lock "${DIST_ROOT}/"
+          cp -a LICENSE "${DIST_ROOT}/"
+          cp -a README.md "${DIST_ROOT}/"
+
+          cd "${RUNNER_TEMP}"
+          zip -r "${GITHUB_WORKSPACE}/${PACKAGE_NAME}.zip" "${PACKAGE_NAME}"
+
+      - name: Create checksum
+        shell: bash
+        run: |
+          set -euo pipefail
+          TAG="${GITHUB_REF_NAME}"
+          PACKAGE_NAME="blogme-${TAG}.zip"
+          sha256sum "${PACKAGE_NAME}" > "${PACKAGE_NAME}.sha256"
+
+      - name: Publish release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            blogme-${{ github.ref_name }}.zip
+            blogme-${{ github.ref_name }}.zip.sha256
+          generate_release_notes: true
