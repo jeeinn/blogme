@@ -154,7 +154,7 @@ final class AdminController extends BaseController
 
         $items = [];
         foreach ($names as $i => $name) {
-            if (!empty($isDeleted[$i])) {
+            if ($this->toBool($isDeleted[$i] ?? false)) {
                 continue;
             }
             $items[] = [
