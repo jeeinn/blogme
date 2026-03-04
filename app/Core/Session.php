@@ -10,11 +10,12 @@ final class Session
     {
         if (session_status() !== PHP_SESSION_ACTIVE) {
             session_name('blogme');
-            $isSecure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off');
+            $isSecure = Request::isTlsServer($_SERVER);
             session_start([
                 'cookie_httponly' => true,
-                'cookie_samesite' => $isSecure ? 'None' : 'Lax',
+                'cookie_samesite' => 'Lax',
                 'cookie_secure' => $isSecure,
+                'cookie_path' => '/',
             ]);
         }
     }

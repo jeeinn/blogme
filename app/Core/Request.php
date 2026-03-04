@@ -74,10 +74,44 @@ final class Request
 
     public function isTls(): bool
     {
-        if (!empty($this->server['HTTPS']) && $this->server['HTTPS'] !== 'off') {
+        return self::isTlsServer($this->server);
+    }
+
+    public static function isTlsServer(array $server): bool
+    {
+        $https = strtolower((string) ($server['HTTPS'] ?? ''));
+        if ($https !== '' && $https !== 'off' && $https !== '0') {
             return true;
         }
-        return (($this->server['SERVER_PORT'] ?? null) === '443');
+        if ((string) ($server['SERVER_PORT'] ?? '') === '443') {
+            return true;
+        }
+
+        $forwardedProto = strtolower(trim((string) ($server['HTTP_X_FORWARDED_PROTO'] ?? '')));
+        if ($forwardedProto !== '') {
+            $firstProto = trim(explode(',', $forwardedProto)[0] ?? '');
+            if ($firstProto === 'https') {
+                return true;
+            }
+        }
+
+        $forwardedSsl = strtolower((string) ($server['HTTP_X_FORWARDED_SSL'] ?? ''));
+        if ($forwardedSsl === 'on' || $forwardedSsl === '1') {
+            return true;
+        }
+        if ((string) ($server['HTTP_X_FORWARDED_PORT'] ?? '') === '443') {
+            return true;
+        }
+
+        $cfVisitor = (string) ($server['HTTP_CF_VISITOR'] ?? '');
+        if ($cfVisitor !== '') {
+            $decoded = json_decode($cfVisitor, true);
+            if (is_array($decoded) && strtolower((string) ($decoded['scheme'] ?? '')) === 'https') {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public function scheme(): string
