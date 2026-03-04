@@ -319,7 +319,7 @@ const data = {
             .trim()
             .toLowerCase()
             .replace(/\s+/g, "-")
-            .replace(new RegExp({=json_encode("[^A-Za-z0-9\\-._~!$&'()*+,;=\\p{L}\\p{N}]")}, "gu"), "")
+            .replace(/[^A-Za-z0-9._~!$&'()*+,;=-]/g, "")
     },
 
     onFormSubmit() {
