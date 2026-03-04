@@ -23,25 +23,26 @@ final class App
     private ?array $config = null;
 
     public function __construct(
-        private readonly string $root,
-        private readonly Request $request,
-        private readonly Router $router,
-        private readonly Session $session,
-        private readonly Flash $flash,
-        private readonly GoTemplateEngine $view,
-        private readonly LocaleService $locale,
-        private readonly RateLimiter $rateLimiter,
-        private readonly Database $db,
-        private readonly UserRepository $users,
-        private readonly TagRepository $tags,
+        private readonly string               $root,
+        private readonly Request              $request,
+        private readonly Router               $router,
+        private readonly Session              $session,
+        private readonly Flash                $flash,
+        private readonly GoTemplateEngine     $view,
+        private readonly LocaleService        $locale,
+        private readonly RateLimiter          $rateLimiter,
+        private readonly Database             $db,
+        private readonly UserRepository       $users,
+        private readonly TagRepository        $tags,
         private readonly NavigationRepository $navigations,
-        private readonly PostRepository $posts
-    ) {
+        private readonly PostRepository       $posts
+    )
+    {
         $this->csrf = new Csrf($session);
         $this->configService = new ConfigService($root);
         $this->config = $this->loadConfig();
         if ($this->config !== null) {
-            $this->locale->loadThemeLocale((string) $this->config['Theme']);
+            $this->locale->loadThemeLocale((string)$this->config['Theme']);
         }
         $this->registerRoutes();
     }
@@ -131,7 +132,7 @@ final class App
     {
         $this->config = $config;
         $this->configService->save($this->configToJson($config));
-        $this->locale->loadThemeLocale((string) $config['Theme']);
+        $this->locale->loadThemeLocale((string)$config['Theme']);
     }
 
     public function configExists(): bool
@@ -152,13 +153,13 @@ final class App
 
     public function translate(string $key): string
     {
-        $locale = (string) (($this->config['Locale'] ?? 'en-us'));
+        $locale = (string)(($this->config['Locale'] ?? 'en-us'));
         return $this->locale->t($key, $locale);
     }
 
     public function currentUserId(): string
     {
-        return (string) $this->session->get('user_id', '');
+        return (string)$this->session->get('user_id', '');
     }
 
     public function setCurrentUser(string $userId): void
@@ -196,63 +197,63 @@ final class App
         $admin = new AdminController($this);
         $public = new PublicController($this);
 
-        $this->router->get('/wizard', fn (array $vars, string $pattern): mixed => $wizard->view($vars, $pattern), 'wizard.view');
-        $this->router->post('/wizard', fn (array $vars, string $pattern): mixed => $wizard->submit($vars, $pattern), 'wizard.submit');
+        $this->router->get('/wizard', fn(array $vars, string $pattern): mixed => $wizard->view($vars, $pattern), 'wizard.view');
+        $this->router->post('/wizard', fn(array $vars, string $pattern): mixed => $wizard->submit($vars, $pattern), 'wizard.submit');
 
-        $this->router->get('/login', fn (array $vars, string $pattern): mixed => $auth->view($vars, $pattern), 'auth.view');
-        $this->router->post('/login', fn (array $vars, string $pattern): mixed => $auth->login($vars, $pattern), 'auth.login');
-        $this->router->post('/admin/logout', fn (array $vars, string $pattern): mixed => $auth->logout($vars, $pattern), 'auth.logout');
+        $this->router->get('/login', fn(array $vars, string $pattern): mixed => $auth->view($vars, $pattern), 'auth.view');
+        $this->router->post('/login', fn(array $vars, string $pattern): mixed => $auth->login($vars, $pattern), 'auth.login');
+        $this->router->post('/admin/logout', fn(array $vars, string $pattern): mixed => $auth->logout($vars, $pattern), 'auth.logout');
 
-        $this->router->get('/admin', fn (): mixed => redirect('/admin/posts'), 'admin.root');
-        $this->router->get('/admin/users', fn (array $vars, string $pattern): mixed => $admin->usersView($vars, $pattern), 'admin.users.view');
-        $this->router->post('/admin/users', fn (array $vars, string $pattern): mixed => $admin->userCreate($vars, $pattern), 'admin.users.create');
-        $this->router->get('/admin/user/{id}', fn (array $vars, string $pattern): mixed => $admin->userEditView($vars, $pattern), 'admin.user.view');
-        $this->router->post('/admin/user/{id}', fn (array $vars, string $pattern): mixed => $admin->userEdit($vars, $pattern), 'admin.user.edit');
-        $this->router->post('/admin/user/{id}/delete', fn (array $vars, string $pattern): mixed => $admin->userDelete($vars, $pattern), 'admin.user.delete');
+        $this->router->get('/admin', fn(): mixed => redirect('/admin/posts'), 'admin.root');
+        $this->router->get('/admin/users', fn(array $vars, string $pattern): mixed => $admin->usersView($vars, $pattern), 'admin.users.view');
+        $this->router->post('/admin/users', fn(array $vars, string $pattern): mixed => $admin->userCreate($vars, $pattern), 'admin.users.create');
+        $this->router->get('/admin/user/{id}', fn(array $vars, string $pattern): mixed => $admin->userEditView($vars, $pattern), 'admin.user.view');
+        $this->router->post('/admin/user/{id}', fn(array $vars, string $pattern): mixed => $admin->userEdit($vars, $pattern), 'admin.user.edit');
+        $this->router->post('/admin/user/{id}/delete', fn(array $vars, string $pattern): mixed => $admin->userDelete($vars, $pattern), 'admin.user.delete');
 
-        $this->router->get('/admin/navigations', fn (array $vars, string $pattern): mixed => $admin->navigationsView($vars, $pattern), 'admin.navigations.view');
-        $this->router->post('/admin/navigations', fn (array $vars, string $pattern): mixed => $admin->navigationCreate($vars, $pattern), 'admin.navigations.create');
-        $this->router->post('/admin/navigations/edit', fn (array $vars, string $pattern): mixed => $admin->navigationEdit($vars, $pattern), 'admin.navigations.edit');
+        $this->router->get('/admin/navigations', fn(array $vars, string $pattern): mixed => $admin->navigationsView($vars, $pattern), 'admin.navigations.view');
+        $this->router->post('/admin/navigations', fn(array $vars, string $pattern): mixed => $admin->navigationCreate($vars, $pattern), 'admin.navigations.create');
+        $this->router->post('/admin/navigations/edit', fn(array $vars, string $pattern): mixed => $admin->navigationEdit($vars, $pattern), 'admin.navigations.edit');
 
-        $this->router->get('/admin/tags', fn (array $vars, string $pattern): mixed => $admin->tagsView($vars, $pattern), 'admin.tags.view');
-        $this->router->post('/admin/tags', fn (array $vars, string $pattern): mixed => $admin->tagCreate($vars, $pattern), 'admin.tags.create');
-        $this->router->get('/admin/tag/{id}', fn (array $vars, string $pattern): mixed => $admin->tagEditView($vars, $pattern), 'admin.tag.view');
-        $this->router->post('/admin/tag/{id}', fn (array $vars, string $pattern): mixed => $admin->tagEdit($vars, $pattern), 'admin.tag.edit');
-        $this->router->post('/admin/tag/{id}/delete', fn (array $vars, string $pattern): mixed => $admin->tagDelete($vars, $pattern), 'admin.tag.delete');
+        $this->router->get('/admin/tags', fn(array $vars, string $pattern): mixed => $admin->tagsView($vars, $pattern), 'admin.tags.view');
+        $this->router->post('/admin/tags', fn(array $vars, string $pattern): mixed => $admin->tagCreate($vars, $pattern), 'admin.tags.create');
+        $this->router->get('/admin/tag/{id}', fn(array $vars, string $pattern): mixed => $admin->tagEditView($vars, $pattern), 'admin.tag.view');
+        $this->router->post('/admin/tag/{id}', fn(array $vars, string $pattern): mixed => $admin->tagEdit($vars, $pattern), 'admin.tag.edit');
+        $this->router->post('/admin/tag/{id}/delete', fn(array $vars, string $pattern): mixed => $admin->tagDelete($vars, $pattern), 'admin.tag.delete');
 
-        $this->router->get('/admin/settings', fn (array $vars, string $pattern): mixed => $admin->settingsView($vars, $pattern), 'admin.settings.view');
-        $this->router->post('/admin/settings', fn (array $vars, string $pattern): mixed => $admin->settingsEdit($vars, $pattern), 'admin.settings.edit');
+        $this->router->get('/admin/settings', fn(array $vars, string $pattern): mixed => $admin->settingsView($vars, $pattern), 'admin.settings.view');
+        $this->router->post('/admin/settings', fn(array $vars, string $pattern): mixed => $admin->settingsEdit($vars, $pattern), 'admin.settings.edit');
 
-        $this->router->get('/admin/appearances', fn (array $vars, string $pattern): mixed => $admin->appearancesView($vars, $pattern), 'admin.appearances.view');
-        $this->router->post('/admin/appearances', fn (array $vars, string $pattern): mixed => $admin->appearancesEdit($vars, $pattern), 'admin.appearances.edit');
-        $this->router->post('/admin/appearances/injected', fn (array $vars, string $pattern): mixed => $admin->appearancesInjectedEdit($vars, $pattern), 'admin.appearances.injected');
+        $this->router->get('/admin/appearances', fn(array $vars, string $pattern): mixed => $admin->appearancesView($vars, $pattern), 'admin.appearances.view');
+        $this->router->post('/admin/appearances', fn(array $vars, string $pattern): mixed => $admin->appearancesEdit($vars, $pattern), 'admin.appearances.edit');
+        $this->router->post('/admin/appearances/injected', fn(array $vars, string $pattern): mixed => $admin->appearancesInjectedEdit($vars, $pattern), 'admin.appearances.injected');
 
-        $this->router->get('/admin/post/create', fn (array $vars, string $pattern): mixed => $admin->postCreateView($vars, $pattern), 'admin.post.create.view');
-        $this->router->post('/admin/post/create', fn (array $vars, string $pattern): mixed => $admin->postCreate($vars, $pattern), 'admin.post.create');
-        $this->router->get('/admin/posts', fn (array $vars, string $pattern): mixed => $admin->postsView($vars, $pattern), 'admin.posts.view');
-        $this->router->post('/admin/trashes/clear', fn (array $vars, string $pattern): mixed => $admin->trashClear($vars, $pattern), 'admin.trashes.clear');
-        $this->router->get('/admin/post/{id}', fn (array $vars, string $pattern): mixed => $admin->postEditView($vars, $pattern), 'admin.post.view');
-        $this->router->post('/admin/post/{id}', fn (array $vars, string $pattern): mixed => $admin->postEdit($vars, $pattern), 'admin.post.edit');
-        $this->router->post('/admin/post/{id}/delete', fn (array $vars, string $pattern): mixed => $admin->postDelete($vars, $pattern), 'admin.post.delete');
-        $this->router->post('/admin/post/{id}/trash', fn (array $vars, string $pattern): mixed => $admin->postTrash($vars, $pattern), 'admin.post.trash');
-        $this->router->post('/admin/post/{id}/untrash', fn (array $vars, string $pattern): mixed => $admin->postUntrash($vars, $pattern), 'admin.post.untrash');
+        $this->router->get('/admin/post/create', fn(array $vars, string $pattern): mixed => $admin->postCreateView($vars, $pattern), 'admin.post.create.view');
+        $this->router->post('/admin/post/create', fn(array $vars, string $pattern): mixed => $admin->postCreate($vars, $pattern), 'admin.post.create');
+        $this->router->get('/admin/posts', fn(array $vars, string $pattern): mixed => $admin->postsView($vars, $pattern), 'admin.posts.view');
+        $this->router->post('/admin/trashes/clear', fn(array $vars, string $pattern): mixed => $admin->trashClear($vars, $pattern), 'admin.trashes.clear');
+        $this->router->get('/admin/post/{id}', fn(array $vars, string $pattern): mixed => $admin->postEditView($vars, $pattern), 'admin.post.view');
+        $this->router->post('/admin/post/{id}', fn(array $vars, string $pattern): mixed => $admin->postEdit($vars, $pattern), 'admin.post.edit');
+        $this->router->post('/admin/post/{id}/delete', fn(array $vars, string $pattern): mixed => $admin->postDelete($vars, $pattern), 'admin.post.delete');
+        $this->router->post('/admin/post/{id}/trash', fn(array $vars, string $pattern): mixed => $admin->postTrash($vars, $pattern), 'admin.post.trash');
+        $this->router->post('/admin/post/{id}/untrash', fn(array $vars, string $pattern): mixed => $admin->postUntrash($vars, $pattern), 'admin.post.untrash');
 
-        $this->router->post('/admin/photos/api', fn (array $vars, string $pattern): mixed => $admin->photoCreateApi($vars, $pattern), 'admin.photos.api');
-        $this->router->get('/admin/photos', fn (array $vars, string $pattern): mixed => $admin->photosView($vars, $pattern), 'admin.photos.view');
-        $this->router->post('/admin/photos', fn (array $vars, string $pattern): mixed => $admin->photoUpload($vars, $pattern), 'admin.photos.upload');
-        $this->router->post('/admin/photo/delete', fn (array $vars, string $pattern): mixed => $admin->photoDelete($vars, $pattern), 'admin.photos.delete');
+        $this->router->post('/admin/photos/api', fn(array $vars, string $pattern): mixed => $admin->photoCreateApi($vars, $pattern), 'admin.photos.api');
+        $this->router->get('/admin/photos', fn(array $vars, string $pattern): mixed => $admin->photosView($vars, $pattern), 'admin.photos.view');
+        $this->router->post('/admin/photos', fn(array $vars, string $pattern): mixed => $admin->photoUpload($vars, $pattern), 'admin.photos.upload');
+        $this->router->post('/admin/photo/delete', fn(array $vars, string $pattern): mixed => $admin->photoDelete($vars, $pattern), 'admin.photos.delete');
 
-        $this->router->get('/', fn (array $vars, string $pattern): mixed => $public->index($vars, $pattern), 'public.index');
-        $this->router->get('/sitemap.xml', fn (array $vars, string $pattern): mixed => $public->sitemap($vars, $pattern), 'public.sitemap');
-        $this->router->get('/rss.xml', fn (array $vars, string $pattern): mixed => $public->rss($vars, $pattern), 'public.rss');
-        $this->router->get('/assets/{asset}', fn (array $vars, string $pattern): mixed => $public->asset($vars, $pattern), 'public.asset');
-        $this->router->get('/tag/{tag}', fn (array $vars, string $pattern): mixed => $public->index($vars, $pattern), 'public.tag');
-        $this->router->get('/author/{author}', fn (array $vars, string $pattern): mixed => $public->index($vars, $pattern), 'public.author');
-        $this->router->get('/archive/{year}', fn (array $vars, string $pattern): mixed => $public->index($vars, $pattern), 'public.archive.year');
-        $this->router->get('/archive/{year}/{month}', fn (array $vars, string $pattern): mixed => $public->index($vars, $pattern), 'public.archive.month');
-        $this->router->get('/archive/{year}/{month}/{day}', fn (array $vars, string $pattern): mixed => $public->index($vars, $pattern), 'public.archive.day');
-        $this->router->get('/post/{slug}', fn (array $vars, string $pattern): mixed => $public->singular($vars, $pattern), 'public.post.get');
-        $this->router->post('/post/{slug}', fn (array $vars, string $pattern): mixed => $public->singular($vars, $pattern), 'public.post.post');
+        $this->router->get('/', fn(array $vars, string $pattern): mixed => $public->index($vars, $pattern), 'public.index');
+        $this->router->get('/sitemap.xml', fn(array $vars, string $pattern): mixed => $public->sitemap($vars, $pattern), 'public.sitemap');
+        $this->router->get('/rss.xml', fn(array $vars, string $pattern): mixed => $public->rss($vars, $pattern), 'public.rss');
+        $this->router->get('/assets/{asset}', fn(array $vars, string $pattern): mixed => $public->asset($vars, $pattern), 'public.asset');
+        $this->router->get('/tag/{tag}', fn(array $vars, string $pattern): mixed => $public->index($vars, $pattern), 'public.tag');
+        $this->router->get('/author/{author}', fn(array $vars, string $pattern): mixed => $public->index($vars, $pattern), 'public.author');
+        $this->router->get('/archive/{year}', fn(array $vars, string $pattern): mixed => $public->index($vars, $pattern), 'public.archive.year');
+        $this->router->get('/archive/{year}/{month}', fn(array $vars, string $pattern): mixed => $public->index($vars, $pattern), 'public.archive.month');
+        $this->router->get('/archive/{year}/{month}/{day}', fn(array $vars, string $pattern): mixed => $public->index($vars, $pattern), 'public.archive.day');
+        $this->router->get('/post/{slug}', fn(array $vars, string $pattern): mixed => $public->singular($vars, $pattern), 'public.post.get');
+        $this->router->post('/post/{slug}', fn(array $vars, string $pattern): mixed => $public->singular($vars, $pattern), 'public.post.post');
     }
 
     private function loadConfig(): ?array
@@ -263,7 +264,7 @@ final class App
         }
         $mapped = [];
         foreach ($raw as $key => $value) {
-            $mapped[$this->snakeToPascal((string) $key)] = $value;
+            $mapped[$this->snakeToPascal((string)$key)] = $value;
         }
         return $mapped;
     }
@@ -272,7 +273,7 @@ final class App
     {
         $json = [];
         foreach ($config as $key => $value) {
-            $json[$this->pascalToSnake((string) $key)] = $value;
+            $json[$this->pascalToSnake((string)$key)] = $value;
         }
         return $json;
     }
@@ -284,20 +285,20 @@ final class App
 
     private function pascalToSnake(string $key): string
     {
-        $step1 = (string) preg_replace('/([A-Z]+)([A-Z][a-z])/', '$1_$2', $key);
-        $step2 = (string) preg_replace('/([a-z0-9])([A-Z])/', '$1_$2', $step1);
+        $step1 = (string)preg_replace('/([A-Z]+)([A-Z][a-z])/', '$1_$2', $key);
+        $step2 = (string)preg_replace('/([a-z0-9])([A-Z])/', '$1_$2', $step1);
         return strtolower($step2);
     }
 
     private function clearExpiredTrashWhenDue(): void
     {
         $flagPath = $this->root . '/storage/runtime/trash_cleanup_at.txt';
-        $last = is_file($flagPath) ? (int) file_get_contents($flagPath) : 0;
+        $last = is_file($flagPath) ? (int)file_get_contents($flagPath) : 0;
         if (time() - $last < 86400) {
             return;
         }
         $this->posts->clearExpiredTrash();
-        file_put_contents($flagPath, (string) time());
+        file_put_contents($flagPath, (string)time());
     }
 
     private function serveStaticIfMatched(): bool
@@ -318,7 +319,7 @@ final class App
         if (str_starts_with($path, '/assets/')) {
             $theme = 'default';
             if ($this->configExists()) {
-                $theme = (string) (($this->config() ?? [])['Theme'] ?? 'default');
+                $theme = (string)(($this->config() ?? [])['Theme'] ?? 'default');
             }
             $relative = substr($path, strlen('/assets/'));
             $base = $this->root . '/data/themes/' . $theme . '/assets';
@@ -353,6 +354,30 @@ final class App
 
     private function outputFile(string $file): void
     {
+        $ext = strtolower((string)pathinfo($file, PATHINFO_EXTENSION));
+        $mimeMap = [
+            'css'   => 'text/css; charset=utf-8',
+            'js'    => 'application/javascript; charset=utf-8',
+            'svg'   => 'image/svg+xml',
+            'png'   => 'image/png',
+            'jpg'   => 'image/jpeg',
+            'jpeg'  => 'image/jpeg',
+            'gif'   => 'image/gif',
+            'webp'  => 'image/webp',
+            'woff2' => 'font/woff2',
+            'woff'  => 'font/woff',
+            'ttf'   => 'font/ttf',
+            'otf'   => 'font/otf',
+            'eot'   => 'application/vnd.ms-fontobject',
+            'ico'   => 'image/x-icon',
+            'xml'   => 'application/xml; charset=utf-8',
+        ];
+        if (isset($mimeMap[$ext])) {
+            header('Content-Type: ' . $mimeMap[$ext]);
+            readfile($file);
+            return;
+        }
+
         $mime = '';
         if (function_exists('mime_content_type')) {
             $detected = mime_content_type($file);
@@ -368,27 +393,6 @@ final class App
                 if (is_string($detected) && $detected !== '' && strtolower($detected) !== 'application/octet-stream') {
                     $mime = $detected;
                 }
-            }
-        }
-        if ($mime === '') {
-            $ext = strtolower((string) pathinfo($file, PATHINFO_EXTENSION));
-            $mimeMap = [
-                'css' => 'text/css; charset=utf-8',
-                'js' => 'application/javascript; charset=utf-8',
-                'svg' => 'image/svg+xml',
-                'png' => 'image/png',
-                'jpg' => 'image/jpeg',
-                'jpeg' => 'image/jpeg',
-                'gif' => 'image/gif',
-                'webp' => 'image/webp',
-                'woff2' => 'font/woff2',
-                'woff' => 'font/woff',
-                'ttf' => 'font/ttf',
-                'otf' => 'font/otf',
-                'eot' => 'application/vnd.ms-fontobject',
-            ];
-            if (isset($mimeMap[$ext])) {
-                $mime = $mimeMap[$ext];
             }
         }
         if ($mime === '') {

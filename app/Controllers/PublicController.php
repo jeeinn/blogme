@@ -199,6 +199,31 @@ final class PublicController extends BaseController
         if ($base === false || $file === false || !str_starts_with($file, $base) || !is_file($file)) {
             throw new HttpException(404, 'asset not found');
         }
+
+        $ext = strtolower((string) pathinfo($file, PATHINFO_EXTENSION));
+        $mimeMap = [
+            'css' => 'text/css; charset=utf-8',
+            'js' => 'application/javascript; charset=utf-8',
+            'svg' => 'image/svg+xml',
+            'png' => 'image/png',
+            'jpg' => 'image/jpeg',
+            'jpeg' => 'image/jpeg',
+            'gif' => 'image/gif',
+            'webp' => 'image/webp',
+            'woff2' => 'font/woff2',
+            'woff' => 'font/woff',
+            'ttf' => 'font/ttf',
+            'otf' => 'font/otf',
+            'eot' => 'application/vnd.ms-fontobject',
+            'ico' => 'image/x-icon',
+            'xml' => 'application/xml; charset=utf-8',
+        ];
+        if (isset($mimeMap[$ext])) {
+            header('Content-Type: ' . $mimeMap[$ext]);
+            readfile($file);
+            return;
+        }
+
         $mime = '';
         if (function_exists('mime_content_type')) {
             $detected = mime_content_type($file);
@@ -217,18 +242,7 @@ final class PublicController extends BaseController
             }
         }
         if ($mime === '') {
-            $ext = strtolower((string) pathinfo($file, PATHINFO_EXTENSION));
-            $mimeMap = [
-                'css' => 'text/css; charset=utf-8',
-                'js' => 'application/javascript; charset=utf-8',
-                'svg' => 'image/svg+xml',
-                'png' => 'image/png',
-                'jpg' => 'image/jpeg',
-                'jpeg' => 'image/jpeg',
-                'gif' => 'image/gif',
-                'webp' => 'image/webp',
-            ];
-            $mime = $mimeMap[$ext] ?? 'application/octet-stream';
+            $mime = 'application/octet-stream';
         }
         header('Content-Type: ' . $mime);
         readfile($file);
