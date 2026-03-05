@@ -14,6 +14,7 @@
 /data/uploads/covers/
 /public/uploads/**
 /public/admin/assets/
+/public/assets/
 /node_modules/
 
 # Keep theme directory tracked but allow runtime customization in deployment

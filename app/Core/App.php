@@ -246,7 +246,6 @@ final class App
         $this->router->get('/', fn(array $vars, string $pattern): mixed => $public->index($vars, $pattern), 'public.index');
         $this->router->get('/sitemap.xml', fn(array $vars, string $pattern): mixed => $public->sitemap($vars, $pattern), 'public.sitemap');
         $this->router->get('/rss.xml', fn(array $vars, string $pattern): mixed => $public->rss($vars, $pattern), 'public.rss');
-        $this->router->get('/assets/{asset}', fn(array $vars, string $pattern): mixed => $public->asset($vars, $pattern), 'public.asset');
         $this->router->get('/tag/{tag}', fn(array $vars, string $pattern): mixed => $public->index($vars, $pattern), 'public.tag');
         $this->router->get('/author/{author}', fn(array $vars, string $pattern): mixed => $public->index($vars, $pattern), 'public.author');
         $this->router->get('/archive/{year}', fn(array $vars, string $pattern): mixed => $public->index($vars, $pattern), 'public.archive.year');
@@ -314,16 +313,6 @@ final class App
         }
         if (str_starts_with($path, '/admin/post/uploads/')) {
             $this->serveFile($this->root . '/public/uploads/' . substr($path, strlen('/admin/post/uploads/')), $this->root . '/public/uploads');
-            return true;
-        }
-        if (str_starts_with($path, '/assets/')) {
-            $theme = 'default';
-            if ($this->configExists()) {
-                $theme = (string)(($this->config() ?? [])['Theme'] ?? 'default');
-            }
-            $relative = substr($path, strlen('/assets/'));
-            $base = $this->root . '/data/themes/' . $theme . '/assets';
-            $this->serveFile($base . '/' . $relative, $base);
             return true;
         }
         if (str_starts_with($path, '/admin/assets/')) {
