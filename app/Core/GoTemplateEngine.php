@@ -19,6 +19,7 @@ final class GoTemplateEngine
     private bool $isThemeRender = false;
     private string $renderLocale = 'en-us';
     private string $renderDateFormat = '2006-01-02';
+    private int $renderTimezone = 0;
 
     public function __construct(private readonly string $root, private readonly LocaleService $locale)
     {
@@ -71,6 +72,7 @@ final class GoTemplateEngine
         $this->isThemeRender = $isTheme;
         $this->renderLocale = (string) ($config['Locale'] ?? 'en-us');
         $this->renderDateFormat = (string) ($config['DateFormat'] ?? '2006-01-02');
+        $this->renderTimezone = (int) ($config['Timezone'] ?? 0);
 
         $latte = clone $this->engine;
         $latte->setLoader(new FileLoader($baseDir));
@@ -145,7 +147,7 @@ final class GoTemplateEngine
     private function formatUnixDate(int $unix): string
     {
         $phpFormat = DateFormat::goToPhp($this->renderDateFormat);
-        return gmdate($phpFormat, $unix);
+        return gmdate($phpFormat, $unix + $this->renderTimezone);
     }
 
     private function translate(string $key): string

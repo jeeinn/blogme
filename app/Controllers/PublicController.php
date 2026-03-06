@@ -91,7 +91,7 @@ final class PublicController extends BaseController
             $this->throttle('post_password');
         }
 
-        $post = $this->app->posts()->bySlug((string) $vars['slug']);
+        $post = $this->app->posts()->bySlug((string) $vars['slug'], $config);
         if ($post === null) {
             $this->noRoute($vars);
             return;
@@ -121,8 +121,8 @@ final class PublicController extends BaseController
             ...$this->baseData($routePattern),
             'Post' => $post,
             'Navigations' => $this->app->navigations()->all(),
-            'PreviousPost' => $this->app->posts()->previous((string) $post['ID']),
-            'NextPost' => $this->app->posts()->next((string) $post['ID']),
+            'PreviousPost' => $this->app->posts()->previous((string) $post['ID'], $config),
+            'NextPost' => $this->app->posts()->next((string) $post['ID'], $config),
             'IsUnlocked' => $isUnlocked,
         ]);
         header('Content-Type: text/html; charset=utf-8');

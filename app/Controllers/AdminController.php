@@ -346,6 +346,7 @@ final class AdminController extends BaseController
     public function postsView(array $vars, string $routePattern): void
     {
         $this->guard();
+        $config = $this->app->config() ?? [];
         $page = $this->queryPage();
         $countPerPage = 30;
         $visibility = (string) $this->request()->query('visibility', '');
@@ -366,10 +367,10 @@ final class AdminController extends BaseController
             $query['is_trashed'] = true;
         }
 
-        $posts = $this->app->posts()->list($query, $this->app->config() ?? []);
-        $count = $this->app->posts()->count($query, $this->app->config() ?? []);
+        $posts = $this->app->posts()->list($query, $config);
+        $count = $this->app->posts()->count($query, $config);
         $counts = $this->app->posts()->countByType();
-        $dates = $this->app->posts()->listDates();
+        $dates = $this->app->posts()->listDates($config);
         echo $this->app->view()->renderAdmin('admin_posts', [
             ...$this->baseData($routePattern),
             'Query' => [
@@ -437,7 +438,7 @@ final class AdminController extends BaseController
     public function postEditView(array $vars, string $routePattern): void
     {
         $this->guard();
-        $post = $this->app->posts()->byId((string) $vars['id']);
+        $post = $this->app->posts()->byId((string) $vars['id'], $this->app->config() ?? []);
         if ($post === null) {
             throw new HttpException(404, 'Post not found');
         }
@@ -476,7 +477,7 @@ final class AdminController extends BaseController
     {
         $this->guard(true);
         $id = (string) $vars['id'];
-        $post = $this->app->posts()->byId($id);
+        $post = $this->app->posts()->byId($id, $this->app->config() ?? []);
         if ($post === null) {
             throw new HttpException(404, 'Post not found');
         }

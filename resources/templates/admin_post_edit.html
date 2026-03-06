@@ -297,6 +297,7 @@ const data = {
     tag_input_value: "",
     published_datetime: "",
     published_at: "",
+    site_timezone: Number({=(int) ($ctx->Config->Timezone ?? 0)}),
     is_clear_cover: false,
     json_data: (() => {
         try {
@@ -367,7 +368,32 @@ const data = {
     },
 
     onPublishDateChange() {
-        this.published_at = Math.round(new Date(this.published_datetime).getTime() / 1000)
+        let unix = this.parseDateTimeAsSiteTimezone(this.published_datetime)
+        this.published_at = unix > 0 ? unix : ""
+    },
+
+    parseDateTimeAsSiteTimezone(value) {
+        let match = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})$/.exec(value)
+        if (!match) {
+            return 0
+        }
+        let year = Number(match[1])
+        let month = Number(match[2])
+        let day = Number(match[3])
+        let hour = Number(match[4])
+        let minute = Number(match[5])
+        let utcMillis = Date.UTC(year, month - 1, day, hour, minute) - this.site_timezone * 1000
+        return Math.round(utcMillis / 1000)
+    },
+
+    formatDateTimeForSiteTimezone(unix) {
+        let d = new Date((unix + this.site_timezone) * 1000)
+        let pad = v => String(v).padStart(2, "0")
+        return d.getUTCFullYear()
+            + '-' + pad(d.getUTCMonth() + 1)
+            + '-' + pad(d.getUTCDate())
+            + 'T' + pad(d.getUTCHours())
+            + ':' + pad(d.getUTCMinutes())
     },
 
     init() {
@@ -376,6 +402,11 @@ const data = {
         }
         for (let key in this.json_data) {
             this[key] = this.json_data[key]
+        }
+        if (this.published_at !== "") {
+            this.published_datetime = this.formatDateTimeForSiteTimezone(Number(this.published_at))
+        } else if (this.published_datetime !== "") {
+            this.onPublishDateChange()
         }
     },
 }

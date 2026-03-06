@@ -112,7 +112,7 @@ final class PostRepository
         }
         $stmt = $this->db->pdo()->prepare($sql);
         $stmt->execute($args);
-        return $this->hydratePosts($stmt->fetchAll(PDO::FETCH_ASSOC));
+        return $this->hydratePosts($stmt->fetchAll(PDO::FETCH_ASSOC), $config);
     }
 
     public function count(array $query, array $config): int
@@ -152,13 +152,16 @@ final class PostRepository
     }
 
     /** @return array<int, string> */
-    public function listDates(): array
+    public function listDates(array $config = []): array
     {
-        $rows = $this->db->pdo()->query("SELECT strftime('%Y-%m', datetime(published_at, 'unixepoch')) d FROM posts GROUP BY strftime('%Y-%m', datetime(published_at, 'unixepoch'))")->fetchAll(PDO::FETCH_ASSOC);
+        $timezone = (int) ($config['Timezone'] ?? 0);
+        $stmt = $this->db->pdo()->prepare("SELECT strftime('%Y-%m', datetime(published_at + ?, 'unixepoch')) d FROM posts GROUP BY 1");
+        $stmt->execute([$timezone]);
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
         return array_values(array_map(static fn (array $row): string => (string) $row['d'], $rows));
     }
 
-    public function byId(string $id): ?array
+    public function byId(string $id, array $config = []): ?array
     {
         $stmt = $this->db->pdo()->prepare('SELECT p.id, p.title, p.slug, p.excerpt, p.author_id, p.password, p.visibility, p.content, p.published_at, p.created_at, p.updated_at, p.pinned_at, p.trashed_at, u.id as user_id, u.nickname, u.email, u.bio, u.created_at as user_created_at FROM posts p JOIN users u ON p.author_id = u.id WHERE p.id = :id AND p.trashed_at = 0');
         $stmt->execute(['id' => $id]);
@@ -166,11 +169,11 @@ final class PostRepository
         if ($row === false) {
             return null;
         }
-        $posts = $this->hydratePosts([$row]);
+        $posts = $this->hydratePosts([$row], $config);
         return $posts[0] ?? null;
     }
 
-    public function bySlug(string $slug): ?array
+    public function bySlug(string $slug, array $config = []): ?array
     {
         $stmt = $this->db->pdo()->prepare('SELECT p.id, p.title, p.slug, p.excerpt, p.author_id, p.password, p.visibility, p.content, p.published_at, p.created_at, p.updated_at, p.pinned_at, p.trashed_at, u.id as user_id, u.nickname, u.email, u.bio, u.created_at as user_created_at FROM posts p JOIN users u ON p.author_id = u.id WHERE p.slug = :slug AND p.trashed_at = 0');
         $stmt->execute(['slug' => $slug]);
@@ -178,11 +181,11 @@ final class PostRepository
         if ($row === false) {
             return null;
         }
-        $posts = $this->hydratePosts([$row]);
+        $posts = $this->hydratePosts([$row], $config);
         return $posts[0] ?? null;
     }
 
-    public function previous(string $id): ?array
+    public function previous(string $id, array $config = []): ?array
     {
         $stmt = $this->db->pdo()->prepare(
             "SELECT p.id, p.title, p.slug, p.excerpt, p.author_id, p.password, p.visibility, p.content, p.published_at, p.created_at, p.updated_at, p.pinned_at, p.trashed_at, u.id as user_id, u.nickname, u.email, u.bio, u.created_at as user_created_at
@@ -199,10 +202,10 @@ final class PostRepository
         if ($row === false) {
             return null;
         }
-        return $this->hydratePosts([$row])[0] ?? null;
+        return $this->hydratePosts([$row], $config)[0] ?? null;
     }
 
-    public function next(string $id): ?array
+    public function next(string $id, array $config = []): ?array
     {
         $stmt = $this->db->pdo()->prepare(
             "SELECT p.id, p.title, p.slug, p.excerpt, p.author_id, p.password, p.visibility, p.content, p.published_at, p.created_at, p.updated_at, p.pinned_at, p.trashed_at, u.id as user_id, u.nickname, u.email, u.bio, u.created_at as user_created_at
@@ -219,7 +222,7 @@ final class PostRepository
         if ($row === false) {
             return null;
         }
-        return $this->hydratePosts([$row])[0] ?? null;
+        return $this->hydratePosts([$row], $config)[0] ?? null;
     }
 
     private function buildWhere(array $q, array $config, array &$args): string
@@ -289,12 +292,14 @@ final class PostRepository
     }
 
     /** @param array<int, array<string, mixed>> $rows @return array<int, array<string, mixed>> */
-    private function hydratePosts(array $rows): array
+    private function hydratePosts(array $rows, array $config = []): array
     {
+        $timezone = (int) ($config['Timezone'] ?? 0);
         $data = [];
         foreach ($rows as $row) {
             $id = (string) $row['id'];
             $publishedAt = (int) $row['published_at'];
+            $publishedAtLocal = $publishedAt + $timezone;
             $post = [
                 'ID' => $id,
                 'Title' => (string) $row['title'],
@@ -321,12 +326,12 @@ final class PostRepository
             $tags = $this->tags->byPost($id);
             $post['Tags'] = $tags;
             $post['TagsStr'] = implode(',', array_map(static fn (array $t): string => (string) $t['Name'], $tags));
-            $post['PublishedDate'] = gmdate('Y-m-d', $publishedAt);
-            $post['PublishedAtDatetime'] = gmdate('Y-m-d h:i A', $publishedAt);
-            $post['PublishedAtISO'] = gmdate('Y-m-d\TH:i', $publishedAt);
-            $post['PublishedYear'] = gmdate('Y', $publishedAt);
-            $post['PublishedMonth'] = gmdate('m', $publishedAt);
-            $post['PublishedDay'] = gmdate('d', $publishedAt);
+            $post['PublishedDate'] = gmdate('Y-m-d', $publishedAtLocal);
+            $post['PublishedAtDatetime'] = gmdate('Y-m-d h:i A', $publishedAtLocal);
+            $post['PublishedAtISO'] = gmdate('Y-m-d\TH:i', $publishedAtLocal);
+            $post['PublishedYear'] = gmdate('Y', $publishedAtLocal);
+            $post['PublishedMonth'] = gmdate('m', $publishedAtLocal);
+            $post['PublishedDay'] = gmdate('d', $publishedAtLocal);
             $post['IsPublished'] = time() >= $publishedAt;
             $coverPublic = dirname(__DIR__, 2) . '/public/uploads/covers/' . $id . '.jpg';
             $post['Cover'] = is_file($coverPublic) ? 'uploads/covers/' . $id . '.jpg' : '';
