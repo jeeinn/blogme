@@ -22,15 +22,15 @@
     <meta property="article:tag" content="{=$dot1->Name}" />
     {/foreach}
     <!-- / og -->
-    <link rel="stylesheet" href="{=$ctx->URL->RelativeRoot}assets/tocas.min.css" />
-    <script src="{=$ctx->URL->RelativeRoot}assets/tocas.min.js"></script>
+    <link rel="stylesheet" href="{=$ctx->URL->RelativeRoot}themes/{=(string) ($ctx->Config->Theme ?? 'default')}/assets/tocas.min.css" />
+    <script src="{=$ctx->URL->RelativeRoot}themes/{=(string) ($ctx->Config->Theme ?? 'default')}/assets/tocas.min.js"></script>
     {if $ctx->Config->HighlightJS}
-    <link rel="stylesheet" href="{=$ctx->URL->RelativeRoot}assets/highlight.css" />
+    <link rel="stylesheet" href="{=$ctx->URL->RelativeRoot}themes/{=(string) ($ctx->Config->Theme ?? 'default')}/assets/highlight.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
     {/if}
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-    <link rel="stylesheet" href="{=$ctx->URL->RelativeRoot}assets/style.css" />
-    <link rel="icon" type="image/png" href="{=$ctx->URL->RelativeRoot}assets/favicon.png">
+    <link rel="stylesheet" href="{=$ctx->URL->RelativeRoot}themes/{=(string) ($ctx->Config->Theme ?? 'default')}/assets/style.css" />
+    <link rel="icon" type="image/png" href="{=$ctx->URL->RelativeRoot}themes/{=(string) ($ctx->Config->Theme ?? 'default')}/assets/favicon.png">
     {=$ctx->Config->InjectedHead|html}
 </head>
 <body id="page">

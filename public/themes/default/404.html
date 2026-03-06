@@ -10,11 +10,11 @@
     <meta property="og:url" content="{=$ctx->URL->Absolute}" />
     <meta property="og:description" content="{=$ctx->Config->Description}" />
     <!-- / og -->
-    <link rel="stylesheet" href="{=$ctx->URL->AbsoluteHost}assets/tocas.min.css" />
-    <script src="{=$ctx->URL->AbsoluteHost}assets/tocas.min.js"></script>
+    <link rel="stylesheet" href="{=$ctx->URL->AbsoluteHost}themes/{=(string) ($ctx->Config->Theme ?? 'default')}/assets/tocas.min.css" />
+    <script src="{=$ctx->URL->AbsoluteHost}themes/{=(string) ($ctx->Config->Theme ?? 'default')}/assets/tocas.min.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-    <link rel="stylesheet" href="{=$ctx->URL->AbsoluteHost}assets/style.css" />
-    <link rel="icon" type="image/png" href="{=$ctx->URL->AbsoluteHost}assets/favicon.png">
+    <link rel="stylesheet" href="{=$ctx->URL->AbsoluteHost}themes/{=(string) ($ctx->Config->Theme ?? 'default')}/assets/style.css" />
+    <link rel="icon" type="image/png" href="{=$ctx->URL->AbsoluteHost}themes/{=(string) ($ctx->Config->Theme ?? 'default')}/assets/favicon.png">
     {=$ctx->Config->InjectedHead|html}
 </head>
 <body id="page">

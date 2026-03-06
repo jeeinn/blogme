@@ -15,7 +15,7 @@ final class GoTemplateEngineTest extends TestCase
     protected function setUp(): void
     {
         $root = dirname(__DIR__);
-        $locale = new LocaleService($root . '/resources/locales', $root . '/data/themes');
+        $locale = new LocaleService($root . '/resources/locales', $root . '/public/themes');
         $this->view = new GoTemplateEngine($root, $locale);
     }
 

@@ -38,7 +38,7 @@ function bootstrap_app(): App
     $tagRepo = new TagRepository($db);
     $navRepo = new NavigationRepository($db);
     $postRepo = new PostRepository($db, $tagRepo);
-    $locale = new LocaleService($root . '/resources/locales', $root . '/data/themes');
+    $locale = new LocaleService($root . '/resources/locales', $root . '/public/themes');
     $view = new GoTemplateEngine($root, $locale);
     $rateLimiter = new RateLimiter($root . '/storage/rate_limit');
     $router = new Router();

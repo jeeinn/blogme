@@ -7,9 +7,8 @@
 - Web 服务器：Apache/Nginx（共享主机优先 Apache）
 - 可写目录：
   - `public/uploads`（用户上传）
-  - `public/assets`（主题静态资源镜像）
-  - `public/admin/assets`（后台静态资源镜像）
-  - `data/themes`（如果要在线安装/更新主题）
+  - `public/admin/assets`（后台静态资源）
+  - `public/themes`（若在线安装/更新主题）
   - `storage/rate_limit`
   - `storage/runtime`
   - 根目录（用于创建 `db.sqlite`、`config.json`）
@@ -52,9 +51,6 @@ composer install --no-dev --optimize-autoloader
   - 需将 `public/index.php` 作为入口并调整相对路径，或通过主机面板映射子目录为网站根
 - 若禁用 `exec`：不影响本项目核心运行
 - 若禁用 `gd`：图片将不进行压缩，仅保存原图
-- 历史版本若上传写入过 `data/uploads`：
-  - 新版本会在启动时一次性迁移到 `public/uploads`（标记文件：`storage/runtime/legacy_uploads_migrated.flag`）
-  - 建议迁移完成后将 `data/uploads` 归档或删除，避免目录职责混淆
 
 ## 6. 性能与稳定性建议
 
@@ -63,9 +59,10 @@ composer install --no-dev --optimize-autoloader
   - `db.sqlite`
   - `config.json`
   - `public/uploads/`
-  - `data/themes/`（如有自定义主题或主题改动）
+  - `public/themes/`（如有自定义主题或主题改动）
 - 如使用 CDN，优先缓存：
   - `/assets/*`
+  - `/themes/*`
   - `/admin/assets/*`
   - `/uploads/*`（按业务策略）
 - 备份与恢复可参考：

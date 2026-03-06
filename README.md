@@ -44,15 +44,11 @@ blogme/
 ├─ bootstrap/
 ├─ resources/
 │  ├─ templates/
-│  ├─ admin_assets/
-│  ├─ locales/
-│  └─ themes/default/
-├─ data/
-│  └─ themes/
+│  └─ locales/
 ├─ docs/
 ├─ public/
 │  ├─ uploads/
-│  ├─ assets/
+│  ├─ themes/
 │  └─ admin/assets/
 ├─ storage/
 ├─ tests/
@@ -74,7 +70,7 @@ composer install
 php -S 127.0.0.1:8080 -t public dev-router.php
 ```
 
-说明：`-t public` 必须带上。该命令会让内建服务器优先直出 `public/` 下的静态资源（如 `/assets/*`、`/uploads/*`），其余请求再交给 `public/index.php`。
+说明：`-t public` 必须带上。该命令会让内建服务器优先直出 `public/` 下的静态资源（如 `/themes/*`、`/admin/assets/*`、`/uploads/*`），其余请求再交给 `public/index.php`。
 
 3. 首次访问
 
@@ -87,16 +83,16 @@ php -S 127.0.0.1:8080 -t public dev-router.php
 - 数据库文件：`db.sqlite`
 - 站点配置：`config.json`
 - 上传目录：`public/uploads/`（运行期唯一上传目录）
-- 主题目录：`data/themes/`（主题模板与主题本地化）
+- 主题目录：`public/themes/`（主题模板、主题本地化、主题静态资源）
 
 ## 目录职责（简化后）
 
-- `resources/`：项目内置资源（后台模板、后台静态源、默认主题种子、基础语言包）
-- `data/`：运行期可变内容（主要为主题目录 `data/themes`）
-- `public/`：Web 可访问目录（上传文件与静态发布目录）
+- `resources/`：项目内置资源（后台模板、基础语言包）
+- `public/`：Web 可访问目录（上传文件、后台静态、主题文件）
   - `public/uploads/`：用户上传内容（持久化数据）
-  - `public/assets/`：当前主题静态资源镜像（可重建）
-  - `public/admin/assets/`：后台静态资源镜像（可重建）
+  - `public/admin/assets/`：后台静态资源（受 Git 管理）
+  - `public/themes/`：主题目录（模板 + 主题语言 + 主题静态）
+  - `/assets/*`：兼容路径，运行时映射到当前主题的 `public/themes/<theme>/assets/*`
 
 ## 编辑器与数据链路
 

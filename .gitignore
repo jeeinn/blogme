@@ -11,15 +11,10 @@
 /storage/runtime/
 /storage/logs/
 /storage/cache/
-# legacy upload path (pre-simplification)
-/data/uploads/**
 /public/uploads/**
-/public/admin/assets/
-/public/assets/
 /node_modules/
 
-# Keep theme directory tracked but allow runtime customization in deployment
-!/data/themes/
+# Keep upload directory tracked for .gitkeep only
 !/public/uploads/
 !/public/uploads/covers/
 !/public/uploads/images/

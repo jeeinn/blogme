@@ -193,9 +193,9 @@ final class PublicController extends BaseController
         if ($this->app->configExists()) {
             $theme = (string) (($this->app->config() ?? [])['Theme'] ?? 'default');
         }
-        $base = realpath($this->app->root() . '/data/themes/' . $theme . '/assets');
+        $base = realpath($this->app->root() . '/public/themes/' . $theme . '/assets');
         $asset = basename((string) $vars['asset']);
-        $file = realpath($this->app->root() . '/data/themes/' . $theme . '/assets/' . $asset);
+        $file = realpath($this->app->root() . '/public/themes/' . $theme . '/assets/' . $asset);
         if ($base === false || $file === false || !str_starts_with($file, $base) || !is_file($file)) {
             throw new HttpException(404, 'asset not found');
         }
@@ -256,7 +256,7 @@ final class PublicController extends BaseController
             return;
         }
         $config = $this->app->config() ?? [];
-        $file = $this->app->root() . '/data/themes/' . $config['Theme'] . '/404.html';
+        $file = $this->app->root() . '/public/themes/' . $config['Theme'] . '/404.html';
         if (!is_file($file)) {
             http_response_code(404);
             echo 'Not Found';

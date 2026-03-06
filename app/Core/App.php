@@ -315,9 +315,25 @@ final class App
             $this->serveFile($this->root . '/public/uploads/' . substr($path, strlen('/admin/post/uploads/')), $this->root . '/public/uploads');
             return true;
         }
+        if (str_starts_with($path, '/themes/')) {
+            $relative = substr($path, strlen('/themes/'));
+            $base = $this->root . '/public/themes';
+            $this->serveFile($base . '/' . $relative, $base);
+            return true;
+        }
+        if (str_starts_with($path, '/assets/')) {
+            $relative = substr($path, strlen('/assets/'));
+            $theme = $this->activeTheme();
+            $base = $this->root . '/public/themes/' . $theme . '/assets';
+            if (!is_dir($base)) {
+                $base = $this->root . '/public/themes/default/assets';
+            }
+            $this->serveFile($base . '/' . $relative, $base);
+            return true;
+        }
         if (str_starts_with($path, '/admin/assets/')) {
             $relative = substr($path, strlen('/admin/assets/'));
-            $base = $this->root . '/resources/admin_assets';
+            $base = $this->root . '/public/admin/assets';
             $this->serveFile($base . '/' . $relative, $base);
             return true;
         }
@@ -327,6 +343,15 @@ final class App
             return true;
         }
         return false;
+    }
+
+    private function activeTheme(): string
+    {
+        $theme = (string) ($this->config['Theme'] ?? 'default');
+        if ($theme === '' || !preg_match('/^[A-Za-z0-9_-]+$/', $theme)) {
+            return 'default';
+        }
+        return $theme;
     }
 
     private function serveFile(string $target, string $base): void

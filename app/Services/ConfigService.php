@@ -44,7 +44,7 @@ final class ConfigService
     /** @return array<int, string> */
     public function listThemes(): array
     {
-        $base = $this->root . '/data/themes';
+        $base = $this->root . '/public/themes';
         if (!is_dir($base)) {
             return [];
         }
@@ -64,6 +64,6 @@ final class ConfigService
 
     public function themeExists(string $theme): bool
     {
-        return is_dir($this->root . '/data/themes/' . $theme);
+        return is_dir($this->root . '/public/themes/' . $theme);
     }
 }

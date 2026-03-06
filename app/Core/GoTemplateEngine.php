@@ -56,7 +56,7 @@ final class GoTemplateEngine
     {
         $this->locale->loadThemeLocale($theme);
         return $this->renderTemplateFile(
-            $this->root . '/data/themes/' . $theme,
+            $this->root . '/public/themes/' . $theme,
             $templateFile,
             $data,
             true

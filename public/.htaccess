@@ -5,7 +5,7 @@ RewriteCond %{REQUEST_FILENAME} -d
 RewriteRule ^ - [L]
 
 # Keep static asset paths handled by Apache directly.
-RewriteRule ^(assets|admin/assets|uploads)/ - [L]
+RewriteRule ^(themes|admin/assets|uploads)/ - [L]
 
 <IfModule mod_expires.c>
     ExpiresActive On

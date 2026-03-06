@@ -27,12 +27,12 @@
   - `resources/templates/admin_post_create.html`
   - `resources/templates/admin_post_edit.html`
 - 静态资源：
-  - `resources/admin_assets/editor-crepe-src.js`（源码入口）
-  - `resources/admin_assets/editor-crepe-theme.css`（不含 latex.css 的主题组合）
-  - `resources/admin_assets/editor-crepe.js`（打包后的运行脚本）
-  - `resources/admin_assets/editor-crepe.css`（打包后的样式）
-  - `resources/admin_assets/editor-assets/`（若启用更多功能时的静态依赖）
-  - `resources/admin_assets/style.css`
+  - `public/admin/assets/editor-crepe-src.js`（源码入口）
+  - `public/admin/assets/editor-crepe-theme.css`（不含 latex.css 的主题组合）
+  - `public/admin/assets/editor-crepe.js`（打包后的运行脚本）
+  - `public/admin/assets/editor-crepe.css`（打包后的样式）
+  - `public/admin/assets/editor-assets/`（若启用更多功能时的静态依赖）
+  - `public/admin/assets/style.css`
 
 ## 3.1 本地打包与编译步骤
 
@@ -52,14 +52,14 @@ npm run build:admin-editor
 
 3. 产物说明
 
-- `resources/admin_assets/editor-crepe.js`
-- `resources/admin_assets/editor-crepe.css`
-- `resources/admin_assets/editor-assets/*`
+- `public/admin/assets/editor-crepe.js`
+- `public/admin/assets/editor-crepe.css`
+- `public/admin/assets/editor-assets/*`
 
 4. 何时需要重新编译
 
-- 修改 `resources/admin_assets/editor-crepe-src.js`
-- 修改 `resources/admin_assets/editor-crepe-theme.css`
+- 修改 `public/admin/assets/editor-crepe-src.js`
+- 修改 `public/admin/assets/editor-crepe-theme.css`
 - 升级 `@milkdown/crepe` 版本
 - 调整打包参数（`package.json` 中 `build:admin-editor`）
 
