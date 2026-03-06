@@ -156,7 +156,7 @@
                             </div>
                         </div>
                         <div class="ts-text is-description has-top-spaced-small">
-                            {=tr('settings_timeformat_description')}
+                            {=html(tr('settings_timeformat_description'))}
                         </div>
                     </div>
                 </div>
@@ -177,7 +177,7 @@
             <div class="column is-fluid">
                 <div class="ts-text is-description">
                     <p>{=trf('settings_versions', $ctx->Version, $ctx->RuntimeVersion)}</p>
-                    {=tr('settings_madeof')}
+                    {=html(tr('settings_madeof'))}
                 </div>
             </div>
             <div class="column">

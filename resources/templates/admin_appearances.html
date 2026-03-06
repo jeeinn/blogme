@@ -163,7 +163,7 @@
                             <input name="posts_per_page" type="number" value="{=$ctx->Config->PostsPerPage}" required />
                         </div>
                         <div class="ts-text is-description has-top-spaced-small">
-                            {=tr('appearances_postsperpage_description')}
+                            {=html(tr('appearances_postsperpage_description'))}
                         </div>
                     </div>
                 </div>
@@ -195,7 +195,7 @@
                             </select>
                         </div>
                         <div class="ts-text is-description has-top-spaced-small">
-                            {=tr('appearances_themes_description')}
+                            {=html(tr('appearances_themes_description'))}
                         </div>
                     </div>
                 </div>
@@ -226,7 +226,7 @@
                             <textarea name="injected_head" rows="5">{=$ctx->Config->InjectedHead}</textarea>
                         </div>
                         <div class="ts-text is-description has-top-spaced-small">
-                            {=tr('appearances_injectedhead_description')}
+                            {=html(tr('appearances_injectedhead_description'))}
                         </div>
                     </div>
                 </div>
@@ -240,7 +240,7 @@
                             <textarea name="injected_foot" rows="5">{=$ctx->Config->InjectedFoot}</textarea>
                         </div>
                         <div class="ts-text is-description has-top-spaced-small">
-                            {=tr('appearances_injectedfoot_description')}
+                            {=html(tr('appearances_injectedfoot_description'))}
                         </div>
                     </div>
                 </div>
