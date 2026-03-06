@@ -42,15 +42,18 @@ blogme/
 │  ├─ Services/
 │  └─ Support/
 ├─ bootstrap/
-├─ public/
 ├─ resources/
 │  ├─ templates/
 │  ├─ admin_assets/
 │  ├─ locales/
 │  └─ themes/default/
 ├─ data/
-│  ├─ uploads/
 │  └─ themes/
+├─ docs/
+├─ public/
+│  ├─ uploads/
+│  ├─ assets/
+│  └─ admin/assets/
 ├─ storage/
 ├─ tests/
 ├─ cli.php
@@ -81,8 +84,17 @@ php -S 127.0.0.1:8080 public/index.php
 
 - 数据库文件：`db.sqlite`
 - 站点配置：`config.json`
-- 上传目录：`data/uploads/`
-- 主题目录：`data/themes/`
+- 上传目录：`public/uploads/`（运行期唯一上传目录）
+- 主题目录：`data/themes/`（主题模板与主题本地化）
+
+## 目录职责（简化后）
+
+- `resources/`：项目内置资源（后台模板、后台静态源、默认主题种子、基础语言包）
+- `data/`：运行期可变内容（主要为主题目录 `data/themes`）
+- `public/`：Web 可访问目录（上传文件与静态发布目录）
+  - `public/uploads/`：用户上传内容（持久化数据）
+  - `public/assets/`：当前主题静态资源镜像（可重建）
+  - `public/admin/assets/`：后台静态资源镜像（可重建）
 
 ## 编辑器与数据链路
 
@@ -102,3 +114,4 @@ php -S 127.0.0.1:8080 public/index.php
 共享主机、Apache 重写、权限、备份与上线建议见：
 
 - [DEPLOYMENT.md](./DEPLOYMENT.md)
+- [docs/backup-and-restore.md](./docs/backup-and-restore.md)

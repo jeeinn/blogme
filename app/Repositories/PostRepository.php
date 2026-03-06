@@ -329,8 +329,7 @@ final class PostRepository
             $post['PublishedDay'] = gmdate('d', $publishedAt);
             $post['IsPublished'] = time() >= $publishedAt;
             $coverPublic = dirname(__DIR__, 2) . '/public/uploads/covers/' . $id . '.jpg';
-            $coverLegacy = dirname(__DIR__, 2) . '/data/uploads/covers/' . $id . '.jpg';
-            $post['Cover'] = (is_file($coverPublic) || is_file($coverLegacy)) ? 'uploads/covers/' . $id . '.jpg' : '';
+            $post['Cover'] = is_file($coverPublic) ? 'uploads/covers/' . $id . '.jpg' : '';
             $post['Excerpt'] = $post['OriginalExcerpt'] !== '' ? $post['OriginalExcerpt'] : $this->excerptFromContent($post['Content']);
             $data[] = $post;
         }

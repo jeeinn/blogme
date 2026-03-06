@@ -1,5 +1,6 @@
 # IDE
 .idea
+.codeartsdoer
 
 # project
 /vendor/
@@ -10,8 +11,8 @@
 /storage/runtime/
 /storage/logs/
 /storage/cache/
-/data/uploads/images/
-/data/uploads/covers/
+# legacy upload path (pre-simplification)
+/data/uploads/**
 /public/uploads/**
 /public/admin/assets/
 /public/assets/

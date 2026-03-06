@@ -13,8 +13,6 @@ final class AppSetupService
     public function bootstrapFilesystem(): void
     {
         $paths = [
-            $this->root . '/data/uploads/images',
-            $this->root . '/data/uploads/covers',
             $this->root . '/public/uploads/images',
             $this->root . '/public/uploads/covers',
             $this->root . '/public/admin/assets',
@@ -32,9 +30,9 @@ final class AppSetupService
         }
 
         // Keep builtin PHP server mode working with `-t public` by ensuring
-        // assets and uploads are directly available under public/.
+        // assets are directly available under public/.
         $this->syncDir($this->root . '/resources/admin_assets', $this->root . '/public/admin/assets');
-        $this->syncDir($this->root . '/data/uploads', $this->root . '/public/uploads');
+        $this->migrateLegacyUploadsOnce();
     }
 
     public function bootstrapTheme(): void
@@ -91,6 +89,22 @@ final class AppSetupService
                 copy($srcPath, $dstPath);
             }
         }
+    }
+
+    private function migrateLegacyUploadsOnce(): void
+    {
+        $legacy = $this->root . '/data/uploads';
+        if (!is_dir($legacy)) {
+            return;
+        }
+
+        $marker = $this->root . '/storage/runtime/legacy_uploads_migrated.flag';
+        if (is_file($marker)) {
+            return;
+        }
+
+        $this->syncDir($legacy, $this->root . '/public/uploads');
+        file_put_contents($marker, (string) time());
     }
 
     private function syncActiveThemeAssets(): void
