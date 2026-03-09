@@ -92,7 +92,7 @@
                         <!-- published_at -->
                         <div class="has-top-spaced-small" x-show="is_scheduled === 'true'">
                             <div class="ts-input has-top-spaced-small">
-                                <input type="datetime-local" x-model="published_datetime" x-on:change="onPublishDateChange" />
+                                <input type="datetime-local" name="published_datetime" x-model="published_datetime" x-on:change="onPublishDateChange" />
                             </div>
                             <input type="hidden" name="published_at" x-model="published_at" />
                         </div>
@@ -324,7 +324,12 @@ const data = {
     },
 
     onFormSubmit() {
-        // handled by editor-crepe.js
+        // Ensure hidden unix timestamp is synchronized before submit.
+        if (this.is_scheduled === "true") {
+            this.onPublishDateChange()
+            return
+        }
+        this.published_at = ""
     },
 
     resetCover() {
@@ -371,16 +376,19 @@ const data = {
     },
 
     parseDateTimeAsSiteTimezone(value) {
-        let match = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})$/.exec(value)
+        let normalized = String(value || "").trim()
+        let match = /^(\d{4})-(\d{2})-(\d{2})[T\s](\d{2}):(\d{2})(?::(\d{2}))?$/.exec(normalized)
         if (!match) {
-            return 0
+            let parsedMillis = Date.parse(normalized)
+            return Number.isNaN(parsedMillis) ? 0 : Math.round(parsedMillis / 1000)
         }
         let year = Number(match[1])
         let month = Number(match[2])
         let day = Number(match[3])
         let hour = Number(match[4])
         let minute = Number(match[5])
-        let utcMillis = Date.UTC(year, month - 1, day, hour, minute) - this.site_timezone * 1000
+        let second = Number(match[6] || 0)
+        let utcMillis = Date.UTC(year, month - 1, day, hour, minute, second) - this.site_timezone * 1000
         return Math.round(utcMillis / 1000)
     },
 

@@ -402,6 +402,8 @@ final class AdminController extends BaseController
     public function postCreate(array $vars, string $routePattern): void
     {
         $this->guard(true);
+        $config = $this->app->config() ?? [];
+        $siteTimezone = (int) ($config['Timezone'] ?? 0);
         $id = $this->uuid();
         $authorId = trim((string) $this->request()->post('author_id', ''));
         if ($this->app->users()->byId($authorId) === null) {
@@ -409,7 +411,20 @@ final class AdminController extends BaseController
         }
         $this->saveCover($id);
         $tagIds = $this->createTags((string) $this->request()->post('tags', ''));
-        $publishedAt = (int) $this->request()->post('published_at', 0);
+        $publishedAt = $this->parsePublishedAtFromPost(
+            $this->request()->post('published_at', null),
+            0
+        );
+        if ($publishedAt <= 0 && $this->toBool($this->request()->post('is_scheduled', ''))) {
+            $publishedAt = $this->parsePublishedDatetimeAsSiteTimezone(
+                $this->request()->post('published_datetime', null),
+                $siteTimezone,
+                0
+            );
+        }
+        if ($publishedAt <= 0) {
+            $publishedAt = time();
+        }
         $visibility = (string) $this->request()->post('visibility', 'public');
         $password = '';
         if ($visibility === 'password') {
@@ -424,7 +439,7 @@ final class AdminController extends BaseController
             'password' => $password,
             'visibility' => $visibility,
             'content' => trim((string) $this->request()->post('content', '')),
-            'published_at' => $publishedAt > 0 ? $publishedAt : time(),
+            'published_at' => $publishedAt,
             'created_at' => time(),
             'updated_at' => time(),
             'pinned_at' => $this->toBool($this->request()->post('is_pinned', '')) ? time() : 0,
@@ -476,8 +491,10 @@ final class AdminController extends BaseController
     public function postEdit(array $vars, string $routePattern): void
     {
         $this->guard(true);
+        $config = $this->app->config() ?? [];
+        $siteTimezone = (int) ($config['Timezone'] ?? 0);
         $id = (string) $vars['id'];
-        $post = $this->app->posts()->byId($id, $this->app->config() ?? []);
+        $post = $this->app->posts()->byId($id, $config);
         if ($post === null) {
             throw new HttpException(404, 'Post not found');
         }
@@ -503,6 +520,22 @@ final class AdminController extends BaseController
             $password = '';
         }
 
+        $existingPublishedAt = (int) $post['PublishedAt'];
+        $publishedAt = $this->parsePublishedAtFromPost(
+            $this->request()->post('published_at', null),
+            0
+        );
+        if ($publishedAt <= 0) {
+            $publishedAt = $this->parsePublishedDatetimeAsSiteTimezone(
+                $this->request()->post('published_datetime', null),
+                $siteTimezone,
+                0
+            );
+        }
+        if ($publishedAt <= 0) {
+            $publishedAt = $existingPublishedAt > 0 ? $existingPublishedAt : time();
+        }
+
         $this->app->posts()->update([
             'id' => $id,
             'title' => trim((string) $this->request()->post('title', '')),
@@ -512,7 +545,7 @@ final class AdminController extends BaseController
             'password' => $password,
             'visibility' => $visibility,
             'content' => trim((string) $this->request()->post('content', '')),
-            'published_at' => (int) $this->request()->post('published_at', time()),
+            'published_at' => $publishedAt,
             'created_at' => (int) $post['CreatedAt'],
             'updated_at' => time(),
             'pinned_at' => $this->toBool($this->request()->post('is_pinned', '')) ? time() : 0,
@@ -737,5 +770,64 @@ final class AdminController extends BaseController
             return (int) $value !== 0;
         }
         return in_array(strtolower((string) $value), ['1', 'true', 'on', 'yes'], true);
+    }
+
+    private function parsePublishedAtFromPost(mixed $value, int $fallback): int
+    {
+        if (is_string($value)) {
+            $value = trim($value);
+            if ($value === '' || !preg_match('/^-?\d+$/', $value)) {
+                return $fallback;
+            }
+            $unix = (int) $value;
+            return $unix > 0 ? $unix : $fallback;
+        }
+
+        if (is_int($value)) {
+            return $value > 0 ? $value : $fallback;
+        }
+
+        if (is_float($value)) {
+            $unix = (int) $value;
+            return $unix > 0 ? $unix : $fallback;
+        }
+
+        return $fallback;
+    }
+
+    private function parsePublishedDatetimeAsSiteTimezone(mixed $value, int $siteTimezone, int $fallback): int
+    {
+        if (!is_string($value)) {
+            return $fallback;
+        }
+        $value = trim($value);
+        if ($value === '') {
+            return $fallback;
+        }
+
+        if (!preg_match('/^(\d{4})-(\d{2})-(\d{2})[T\s](\d{2}):(\d{2})(?::(\d{2}))?$/', $value, $matches)) {
+            return $fallback;
+        }
+
+        $year = (int) $matches[1];
+        $month = (int) $matches[2];
+        $day = (int) $matches[3];
+        $hour = (int) $matches[4];
+        $minute = (int) $matches[5];
+        $second = isset($matches[6]) ? (int) $matches[6] : 0;
+
+        if (!checkdate($month, $day, $year)) {
+            return $fallback;
+        }
+        if ($hour < 0 || $hour > 23 || $minute < 0 || $minute > 59 || $second < 0 || $second > 59) {
+            return $fallback;
+        }
+
+        $utc = gmmktime($hour, $minute, $second, $month, $day, $year);
+        if ($utc === false) {
+            return $fallback;
+        }
+        $unix = (int) $utc - $siteTimezone;
+        return $unix > 0 ? $unix : $fallback;
     }
 }
