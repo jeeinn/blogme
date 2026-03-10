@@ -64,7 +64,15 @@ blogme/
 composer install
 ```
 
-2. 启动（开发模式）
+2. 初始化数据库（可选）
+
+```bash
+php cli.php migrate
+```
+
+说明：如未执行 `migrate`，应用会在首次请求时自动初始化数据库。
+
+3. 启动（开发模式）
 
 ```bash
 php -S 127.0.0.1:8080 -t public dev-router.php
@@ -72,7 +80,7 @@ php -S 127.0.0.1:8080 -t public dev-router.php
 
 说明：`-t public` 必须带上。该命令会让内建服务器优先直出 `public/` 下的静态资源（如 `/themes/*`、`/admin/assets/*`、`/uploads/*`），其余请求再交给 `public/index.php`。
 
-3. 首次访问
+4. 首次访问
 
 - 前台：`http://127.0.0.1:8080`
 - 向导：`http://127.0.0.1:8080/wizard`

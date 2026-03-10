@@ -14,6 +14,8 @@ use Blogme\Repositories\TagRepository;
 use Blogme\Repositories\UserRepository;
 use Blogme\Services\ConfigService;
 use Blogme\Services\LocaleService;
+use Blogme\Services\MediaService;
+use Blogme\Services\PostDateService;
 use Blogme\Support\AppData;
 
 final class App
@@ -35,7 +37,9 @@ final class App
         private readonly UserRepository       $users,
         private readonly TagRepository        $tags,
         private readonly NavigationRepository $navigations,
-        private readonly PostRepository       $posts
+        private readonly PostRepository       $posts,
+        private readonly MediaService         $media,
+        private readonly PostDateService      $postDates
     )
     {
         $this->csrf = new Csrf($session);
@@ -121,6 +125,21 @@ final class App
     public function posts(): PostRepository
     {
         return $this->posts;
+    }
+
+    public function db(): Database
+    {
+        return $this->db;
+    }
+
+    public function media(): MediaService
+    {
+        return $this->media;
+    }
+
+    public function postDates(): PostDateService
+    {
+        return $this->postDates;
     }
 
     public function config(): ?array

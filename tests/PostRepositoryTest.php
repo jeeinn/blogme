@@ -80,4 +80,54 @@ final class PostRepositoryTest extends TestCase
         self::assertSame('alice', $list[0]['Author']['Nickname']);
         self::assertSame('php', $list[0]['Tags'][0]['Name']);
     }
+
+    public function testUpdateReplacesTags(): void
+    {
+        $now = time();
+        $this->tags->create([
+            'id' => 't2',
+            'slug' => 'sqlite',
+            'name' => 'sqlite',
+            'description' => '',
+            'created_at' => time(),
+        ]);
+
+        $this->posts->create([
+            'id' => 'p2',
+            'title' => 'Hello',
+            'slug' => 'hello',
+            'excerpt' => '',
+            'author_id' => 'u1',
+            'password' => '',
+            'visibility' => 'public',
+            'content' => 'content',
+            'published_at' => $now - 10,
+            'created_at' => $now - 10,
+            'updated_at' => $now - 10,
+            'pinned_at' => 0,
+            'trashed_at' => 0,
+            'tag_ids' => ['t1'],
+        ]);
+
+        $this->posts->update([
+            'id' => 'p2',
+            'title' => 'Hello',
+            'slug' => 'hello',
+            'excerpt' => '',
+            'author_id' => 'u1',
+            'password' => '',
+            'visibility' => 'public',
+            'content' => 'content',
+            'published_at' => $now - 10,
+            'created_at' => $now - 10,
+            'updated_at' => $now,
+            'pinned_at' => 0,
+            'tag_ids' => ['t2'],
+        ]);
+
+        $post = $this->posts->byId('p2', ['Timezone' => 0]);
+        self::assertNotNull($post);
+        self::assertCount(1, $post['Tags']);
+        self::assertSame('sqlite', $post['Tags'][0]['Name']);
+    }
 }

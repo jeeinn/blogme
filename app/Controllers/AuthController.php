@@ -37,6 +37,7 @@ final class AuthController extends BaseController
         }
 
         $this->app->setCurrentUser((string) $user['ID']);
+        $this->app->session()->regenerate();
         \Blogme\Core\redirect('/admin/posts');
     }
 
@@ -45,6 +46,7 @@ final class AuthController extends BaseController
         $this->requireConfig();
         $this->checkCsrf();
         $this->app->clearCurrentUser();
+        $this->app->session()->regenerate();
         $this->setMessage('notice_loggedout');
         \Blogme\Core\redirect('/login');
     }

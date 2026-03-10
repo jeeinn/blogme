@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Blogme\Core;
 
 use PDO;
+use Throwable;
 
 final class Database
 {
@@ -79,5 +80,32 @@ final class Database
                 sequence INTEGER NOT NULL
             )'
         );
+
+        $this->pdo->exec('CREATE INDEX IF NOT EXISTS idx_posts_slug ON posts (slug)');
+        $this->pdo->exec('CREATE INDEX IF NOT EXISTS idx_posts_author_id ON posts (author_id)');
+        $this->pdo->exec('CREATE INDEX IF NOT EXISTS idx_posts_published_at ON posts (published_at)');
+        $this->pdo->exec('CREATE INDEX IF NOT EXISTS idx_posts_trashed_at ON posts (trashed_at)');
+        $this->pdo->exec('CREATE INDEX IF NOT EXISTS idx_post_tags_post_id ON post_tags (post_id)');
+        $this->pdo->exec('CREATE INDEX IF NOT EXISTS idx_post_tags_tag_id ON post_tags (tag_id)');
+        $this->pdo->exec('CREATE INDEX IF NOT EXISTS idx_tags_slug ON tags (slug)');
+        $this->pdo->exec('CREATE INDEX IF NOT EXISTS idx_tags_name ON tags (name)');
+        $this->pdo->exec('CREATE INDEX IF NOT EXISTS idx_navigations_sequence ON navigations (sequence)');
+    }
+
+    public function transaction(callable $callback): mixed
+    {
+        if ($this->pdo->inTransaction()) {
+            return $callback($this->pdo);
+        }
+
+        $this->pdo->beginTransaction();
+        try {
+            $result = $callback($this->pdo);
+            $this->pdo->commit();
+            return $result;
+        } catch (Throwable $e) {
+            $this->pdo->rollBack();
+            throw $e;
+        }
     }
 }

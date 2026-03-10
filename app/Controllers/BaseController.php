@@ -170,63 +170,6 @@ abstract class BaseController
         return $ids;
     }
 
-    protected function saveCover(string $postId): string
-    {
-        $file = $this->request()->file('cover_file');
-        if (!is_array($file) || (int) ($file['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK) {
-            return '';
-        }
-        $dst = $this->app->root() . '/public/uploads/covers/' . $postId . '.jpg';
-        $this->saveImageFile((string) $file['tmp_name'], $dst, 1024);
-        return 'uploads/covers/' . $postId . '.jpg';
-    }
-
-    protected function savePhoto(array $file): string
-    {
-        $year = gmdate('Y');
-        $month = gmdate('m');
-        $unix = (string) time();
-        $id = $this->uuid();
-        $dir = $this->app->root() . '/public/uploads/images/' . $year . '/' . $month;
-        if (!is_dir($dir)) {
-            mkdir($dir, 0755, true);
-        }
-        $filename = $unix . '_' . $id . '.jpg';
-        $dst = $dir . '/' . $filename;
-        $this->saveImageFile((string) $file['tmp_name'], $dst, 2000);
-        return 'uploads/images/' . $year . '/' . $month . '/' . $filename;
-    }
-
-    protected function saveImageFile(string $srcTmpPath, string $dstPath, int $maxWidth): void
-    {
-        $raw = @file_get_contents($srcTmpPath);
-        if ($raw === false) {
-            throw new HttpException(500, 'Upload read failed');
-        }
-        if (!function_exists('imagecreatefromstring')) {
-            if (!@move_uploaded_file($srcTmpPath, $dstPath)) {
-                copy($srcTmpPath, $dstPath);
-            }
-            return;
-        }
-        $image = @imagecreatefromstring($raw);
-        if ($image === false) {
-            if (!@move_uploaded_file($srcTmpPath, $dstPath)) {
-                copy($srcTmpPath, $dstPath);
-            }
-            return;
-        }
-        $w = imagesx($image);
-        $h = imagesy($image);
-        $targetW = min($w, $maxWidth);
-        $targetH = (int) floor(($h / max(1, $w)) * $targetW);
-        $resized = imagecreatetruecolor($targetW, $targetH);
-        imagecopyresampled($resized, $image, 0, 0, 0, 0, $targetW, $targetH, $w, $h);
-        imagejpeg($resized, $dstPath, 90);
-        imagedestroy($image);
-        imagedestroy($resized);
-    }
-
     protected function goDateToPhp(string $goFormat): string
     {
         return DateFormat::goToPhp($goFormat);

@@ -121,21 +121,22 @@ final class AdminController extends BaseController
             throw new HttpException(400, 'Invalid navigation');
         }
         $navs = $this->app->navigations()->all();
-        $this->app->navigations()->clear();
+        $items = [];
         foreach ($navs as $i => $n) {
-            $this->app->navigations()->create([
+            $items[] = [
                 'id' => (string) $n['ID'],
                 'name' => (string) $n['Name'],
                 'url' => (string) $n['URL'],
                 'sequence' => $i + 1,
-            ]);
+            ];
         }
-        $this->app->navigations()->create([
+        $items[] = [
             'id' => $this->uuid(),
             'name' => $name,
             'url' => $url,
             'sequence' => count($navs) + 1,
-        ]);
+        ];
+        $this->app->navigations()->replaceAll($items);
         $this->setMessage('notice_nagivation_created');
         \Blogme\Core\redirect('/admin/navigations');
     }
@@ -166,11 +167,11 @@ final class AdminController extends BaseController
         }
         usort($items, static fn (array $a, array $b): int => $a['sequence'] <=> $b['sequence']);
 
-        $this->app->navigations()->clear();
-        foreach ($items as $i => $item) {
+        foreach ($items as $i => &$item) {
             $item['sequence'] = $i + 1;
-            $this->app->navigations()->create($item);
         }
+        unset($item);
+        $this->app->navigations()->replaceAll($items);
         $this->setMessage('notice_nagivation_updated');
         \Blogme\Core\redirect('/admin/navigations');
     }
@@ -409,14 +410,14 @@ final class AdminController extends BaseController
         if ($this->app->users()->byId($authorId) === null) {
             throw new HttpException(400, 'Invalid author');
         }
-        $this->saveCover($id);
+        $this->app->media()->saveCover($id, $this->request()->file('cover_file'));
         $tagIds = $this->createTags((string) $this->request()->post('tags', ''));
-        $publishedAt = $this->parsePublishedAtFromPost(
+        $publishedAt = $this->app->postDates()->parsePublishedAtFromPost(
             $this->request()->post('published_at', null),
             0
         );
         if ($publishedAt <= 0 && $this->toBool($this->request()->post('is_scheduled', ''))) {
-            $publishedAt = $this->parsePublishedDatetimeAsSiteTimezone(
+            $publishedAt = $this->app->postDates()->parsePublishedDatetimeAsSiteTimezone(
                 $this->request()->post('published_datetime', null),
                 $siteTimezone,
                 0
@@ -508,7 +509,7 @@ final class AdminController extends BaseController
         if ($clearCover && is_file($coverPath)) {
             @unlink($coverPath);
         } elseif (!$clearCover) {
-            $this->saveCover($id);
+            $this->app->media()->saveCover($id, $this->request()->file('cover_file'));
         }
 
         $visibility = (string) $this->request()->post('visibility', 'public');
@@ -521,12 +522,12 @@ final class AdminController extends BaseController
         }
 
         $existingPublishedAt = (int) $post['PublishedAt'];
-        $publishedAt = $this->parsePublishedAtFromPost(
+        $publishedAt = $this->app->postDates()->parsePublishedAtFromPost(
             $this->request()->post('published_at', null),
             0
         );
         if ($publishedAt <= 0) {
-            $publishedAt = $this->parsePublishedDatetimeAsSiteTimezone(
+            $publishedAt = $this->app->postDates()->parsePublishedDatetimeAsSiteTimezone(
                 $this->request()->post('published_datetime', null),
                 $siteTimezone,
                 0
@@ -592,7 +593,7 @@ final class AdminController extends BaseController
         $this->guard();
         $page = $this->queryPage();
         $countPerPage = 100;
-        $files = $this->collectPhotoFiles();
+        $files = $this->app->media()->collectPhotoFiles();
         usort($files, static fn (array $a, array $b): int => strcmp($b['Filename'], $a['Filename']));
         $count = count($files);
         $offset = ($page - 1) * $countPerPage;
@@ -625,7 +626,7 @@ final class AdminController extends BaseController
         if (!is_array($file) || (int) ($file['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK) {
             throw new HttpException(400, 'photo_file is required');
         }
-        $path = $this->savePhoto($file);
+        $path = $this->app->media()->savePhoto($file);
         header('Content-Type: application/json');
         echo json_encode(['path' => $path], JSON_UNESCAPED_SLASHES);
     }
@@ -633,12 +634,12 @@ final class AdminController extends BaseController
     public function photoUpload(array $vars, string $routePattern): void
     {
         $this->guard(true);
-        $files = $this->normalizeFilesArray($this->request()->file('photo_file') ?? $this->request()->file('photo_file[]'));
+        $files = $this->app->media()->normalizeFilesArray($this->request()->file('photo_file') ?? $this->request()->file('photo_file[]'));
         if ($files === []) {
             throw new HttpException(400, 'photo_file[] is required');
         }
         foreach ($files as $file) {
-            $this->savePhoto($file);
+            $this->app->media()->savePhoto($file);
         }
         $this->setMessage('notice_photo_uploaded');
         \Blogme\Core\redirect('/admin/photos');
@@ -671,96 +672,6 @@ final class AdminController extends BaseController
         }
     }
 
-    /** @return array<int, array<string, string>> */
-    private function collectPhotoFiles(): array
-    {
-        $base = realpath($this->app->root() . '/public/uploads/images');
-        if ($base === false || !is_dir($base)) {
-            return [];
-        }
-
-        $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'avif', 'svg'];
-        $normalizedBase = str_replace('\\', '/', $base);
-        $rii = new \RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator($base, \FilesystemIterator::SKIP_DOTS)
-        );
-        $files = [];
-
-        foreach ($rii as $file) {
-            if (!$file->isFile()) {
-                continue;
-            }
-
-            $filename = $file->getFilename();
-            if ($filename === '' || str_starts_with($filename, '.')) {
-                continue;
-            }
-
-            $ext = strtolower((string) pathinfo($filename, PATHINFO_EXTENSION));
-            if ($ext === '' || !in_array($ext, $allowedExtensions, true)) {
-                continue;
-            }
-
-            $normalizedPathname = str_replace('\\', '/', $file->getPathname());
-            if (!str_starts_with($normalizedPathname, $normalizedBase . '/')) {
-                continue;
-            }
-
-            $relative = substr($normalizedPathname, strlen($normalizedBase) + 1);
-            if ($relative === '' || $relative === false) {
-                continue;
-            }
-
-            $segments = explode('/', $relative);
-            if (count($segments) !== 3) {
-                continue;
-            }
-            [$year, $month, $name] = $segments;
-            if (!preg_match('/^\d{4}$/', $year)) {
-                continue;
-            }
-            if (!preg_match('/^(0[1-9]|1[0-2])$/', $month)) {
-                continue;
-            }
-            if ($name === '' || str_contains($name, '/')) {
-                continue;
-            }
-
-            $files[] = [
-                'Year' => $year,
-                'Month' => $month,
-                'Filename' => $name,
-            ];
-        }
-
-        return $files;
-    }
-
-    /** @return array<int, array<string, mixed>> */
-    private function normalizeFilesArray(mixed $files): array
-    {
-        if (!is_array($files)) {
-            return [];
-        }
-        if (isset($files['name']) && !is_array($files['name'])) {
-            return [$files];
-        }
-        if (!isset($files['name']) || !is_array($files['name'])) {
-            return [];
-        }
-        $result = [];
-        foreach ($files['name'] as $i => $name) {
-            $result[] = [
-                'name' => $name,
-                'type' => $files['type'][$i] ?? '',
-                'tmp_name' => $files['tmp_name'][$i] ?? '',
-                'error' => $files['error'][$i] ?? UPLOAD_ERR_NO_FILE,
-                'size' => $files['size'][$i] ?? 0,
-            ];
-        }
-        return $result;
-    }
-
     private function toBool(mixed $value): bool
     {
         if (is_bool($value)) {
@@ -770,64 +681,5 @@ final class AdminController extends BaseController
             return (int) $value !== 0;
         }
         return in_array(strtolower((string) $value), ['1', 'true', 'on', 'yes'], true);
-    }
-
-    private function parsePublishedAtFromPost(mixed $value, int $fallback): int
-    {
-        if (is_string($value)) {
-            $value = trim($value);
-            if ($value === '' || !preg_match('/^-?\d+$/', $value)) {
-                return $fallback;
-            }
-            $unix = (int) $value;
-            return $unix > 0 ? $unix : $fallback;
-        }
-
-        if (is_int($value)) {
-            return $value > 0 ? $value : $fallback;
-        }
-
-        if (is_float($value)) {
-            $unix = (int) $value;
-            return $unix > 0 ? $unix : $fallback;
-        }
-
-        return $fallback;
-    }
-
-    private function parsePublishedDatetimeAsSiteTimezone(mixed $value, int $siteTimezone, int $fallback): int
-    {
-        if (!is_string($value)) {
-            return $fallback;
-        }
-        $value = trim($value);
-        if ($value === '') {
-            return $fallback;
-        }
-
-        if (!preg_match('/^(\d{4})-(\d{2})-(\d{2})[T\s](\d{2}):(\d{2})(?::(\d{2}))?$/', $value, $matches)) {
-            return $fallback;
-        }
-
-        $year = (int) $matches[1];
-        $month = (int) $matches[2];
-        $day = (int) $matches[3];
-        $hour = (int) $matches[4];
-        $minute = (int) $matches[5];
-        $second = isset($matches[6]) ? (int) $matches[6] : 0;
-
-        if (!checkdate($month, $day, $year)) {
-            return $fallback;
-        }
-        if ($hour < 0 || $hour > 23 || $minute < 0 || $minute > 59 || $second < 0 || $second > 59) {
-            return $fallback;
-        }
-
-        $utc = gmmktime($hour, $minute, $second, $month, $day, $year);
-        if ($utc === false) {
-            return $fallback;
-        }
-        $unix = (int) $utc - $siteTimezone;
-        return $unix > 0 ? $unix : $fallback;
     }
 }

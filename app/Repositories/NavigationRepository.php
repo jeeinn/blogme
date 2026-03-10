@@ -37,4 +37,15 @@ final class NavigationRepository
         $stmt = $this->db->pdo()->prepare('INSERT INTO navigations (id, url, name, sequence) VALUES (:id, :url, :name, :sequence)');
         $stmt->execute($nav);
     }
+
+    /** @param array<int, array{id:string,name:string,url:string,sequence:int}> $items */
+    public function replaceAll(array $items): void
+    {
+        $this->db->transaction(function () use ($items): void {
+            $this->clear();
+            foreach ($items as $item) {
+                $this->create($item);
+            }
+        });
+    }
 }

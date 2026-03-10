@@ -12,7 +12,10 @@ final class Markdown
         if (class_exists(\Parsedown::class)) {
             /** @var \Parsedown $parser */
             $parser = new \Parsedown();
-            $parser->setSafeMode(false);
+            $parser->setSafeMode(true);
+            if (method_exists($parser, 'setMarkupEscaped')) {
+                $parser->setMarkupEscaped(true);
+            }
             return $parser->text($text);
         }
 

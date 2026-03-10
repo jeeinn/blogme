@@ -39,8 +39,16 @@ composer install --no-dev --optimize-autoloader
 ```
 
 3. 确保可写权限已配置
-4. 访问 `/wizard` 完成初始化
-5. 初始化后检查：
+4. 初始化数据库（可选，推荐）：
+
+```bash
+php cli.php migrate
+```
+
+说明：若不便执行 CLI 命令，首次访问时会自动初始化数据库（共享主机友好）。
+
+5. 访问 `/wizard` 完成初始化
+6. 初始化后检查：
   - `db.sqlite` 已创建
   - `config.json` 已生成
   - 后台可登录
@@ -76,6 +84,12 @@ composer install --no-dev --optimize-autoloader
 - 定期检查上传目录和日志目录权限
 
 ## 8. 运维命令
+
+- 初始化数据库：
+
+```bash
+php cli.php migrate
+```
 
 - 重置用户密码：
 

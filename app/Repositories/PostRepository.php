@@ -37,31 +37,37 @@ final class PostRepository
     {
         $tagIds = $post['tag_ids'] ?? [];
         unset($post['tag_ids']);
-        $stmt = $this->db->pdo()->prepare(
-            'INSERT INTO posts (id, title, slug, excerpt, author_id, password, visibility, content, published_at, created_at, updated_at, pinned_at, trashed_at)
-             VALUES (:id, :title, :slug, :excerpt, :author_id, :password, :visibility, :content, :published_at, :created_at, :updated_at, :pinned_at, :trashed_at)'
-        );
-        $stmt->execute($post);
 
-        foreach ($tagIds as $tagId) {
-            $this->db->pdo()->prepare('INSERT INTO post_tags (post_id, tag_id) VALUES (:pid, :tid)')
-                ->execute(['pid' => $post['id'], 'tid' => $tagId]);
-        }
+        $this->db->transaction(function () use ($post, $tagIds): void {
+            $stmt = $this->db->pdo()->prepare(
+                'INSERT INTO posts (id, title, slug, excerpt, author_id, password, visibility, content, published_at, created_at, updated_at, pinned_at, trashed_at)
+                 VALUES (:id, :title, :slug, :excerpt, :author_id, :password, :visibility, :content, :published_at, :created_at, :updated_at, :pinned_at, :trashed_at)'
+            );
+            $stmt->execute($post);
+
+            foreach ($tagIds as $tagId) {
+                $this->db->pdo()->prepare('INSERT INTO post_tags (post_id, tag_id) VALUES (:pid, :tid)')
+                    ->execute(['pid' => $post['id'], 'tid' => $tagId]);
+            }
+        });
     }
 
     public function update(array $post): void
     {
         $tagIds = $post['tag_ids'] ?? [];
         unset($post['tag_ids']);
-        $stmt = $this->db->pdo()->prepare(
-            'UPDATE posts SET title = :title, slug = :slug, excerpt = :excerpt, author_id = :author_id, password = :password, visibility = :visibility, content = :content, published_at = :published_at, created_at = :created_at, updated_at = :updated_at, pinned_at = :pinned_at WHERE id = :id'
-        );
-        $stmt->execute($post);
-        $this->db->pdo()->prepare('DELETE FROM post_tags WHERE post_id = :pid')->execute(['pid' => $post['id']]);
-        foreach ($tagIds as $tagId) {
-            $this->db->pdo()->prepare('INSERT INTO post_tags (post_id, tag_id) VALUES (:pid, :tid)')
-                ->execute(['pid' => $post['id'], 'tid' => $tagId]);
-        }
+
+        $this->db->transaction(function () use ($post, $tagIds): void {
+            $stmt = $this->db->pdo()->prepare(
+                'UPDATE posts SET title = :title, slug = :slug, excerpt = :excerpt, author_id = :author_id, password = :password, visibility = :visibility, content = :content, published_at = :published_at, created_at = :created_at, updated_at = :updated_at, pinned_at = :pinned_at WHERE id = :id'
+            );
+            $stmt->execute($post);
+            $this->db->pdo()->prepare('DELETE FROM post_tags WHERE post_id = :pid')->execute(['pid' => $post['id']]);
+            foreach ($tagIds as $tagId) {
+                $this->db->pdo()->prepare('INSERT INTO post_tags (post_id, tag_id) VALUES (:pid, :tid)')
+                    ->execute(['pid' => $post['id'], 'tid' => $tagId]);
+            }
+        });
     }
 
     public function trash(string $id): void

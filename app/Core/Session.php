@@ -34,4 +34,12 @@ final class Session
     {
         unset($_SESSION[$key]);
     }
+
+    public function regenerate(): bool
+    {
+        if (session_status() !== PHP_SESSION_ACTIVE) {
+            return false;
+        }
+        return session_regenerate_id(true);
+    }
 }
