@@ -41,13 +41,13 @@
         <!-- slate -->
         <div class="ts-content is-secondary is-horizontally-fitted tablet+:has-vertically-padded-huge mobile:has-vertically-padded-big">
             <div class="ts-container">
-                <a href="{=$ctx->URL->RelativeRoot}" class="ts-header is-heavy is-center-aligned tablet+:is-massive mobile:is-big">
+                <a href="{=$ctx->URL->RelativeRoot}./" class="ts-header is-heavy is-center-aligned tablet+:is-massive mobile:is-big">
                     {=$ctx->Config->Name}
                 </a>
                 <div class="ts-text is-center-aligned is-secondary has-top-spaced">
                     {=$ctx->Config->Description}
                 </div>
-                <form id="index-search" class="has-top-spaced-large" method="GET" action="{=$ctx->URL->RelativeRoot}" role="search">
+                <form id="index-search" class="has-top-spaced-large" method="GET" action="{=$ctx->URL->RelativeRoot}./" role="search">
                     <div class="ts-grid is-middle-aligned">
                         <div class="column is-fluid">
                             <div class="ts-input is-fluid">
@@ -79,7 +79,7 @@
                         </div>
                     </div>
                     <div class="column">
-                        <a href="{=$ctx->URL->RelativeRoot}" id="filter-reset" class="ts-button is-outlined">
+                        <a href="{=$ctx->URL->RelativeRoot}./" id="filter-reset" class="ts-button is-outlined">
                             {=tr('button_resetfilter')}
                         </a>
                     </div>
@@ -162,7 +162,7 @@
         <div class="ts-container has-top-spaced-large">
             <div id="index-pagination" class="ts-grid is-middle-aligned">
                 <div class="column mobile:is-order-2 mobile:is-8-wide">
-                    <a href="?page={=sub($ctx->Pagination->CurrentPage, 1)}"
+                    <a href="?{=$ctx->Pagination->Query}page={=sub($ctx->Pagination->CurrentPage, 1)}"
                     class="pagination-item {if eq($ctx->Pagination->CurrentPage, 1)}has-invisible{/if}">
                         {=tr('pagination_new')}
                     </a>
@@ -171,7 +171,7 @@
                     {=trf('pagination_info', $ctx->Pagination->CurrentPage, $ctx->Pagination->TotalPages)}
                 </div>
                 <div class="column mobile:is-order-3 mobile:is-8-wide">
-                    <a href="?page={=add($ctx->Pagination->CurrentPage, 1)}"
+                    <a href="?{=$ctx->Pagination->Query}page={=add($ctx->Pagination->CurrentPage, 1)}"
                     class="pagination-item {if eq($ctx->Pagination->CurrentPage, $ctx->Pagination->TotalPages)}has-invisible{/if}">
                         {=tr('pagination_old')}
                     </a>
