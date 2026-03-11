@@ -4,7 +4,6 @@ on:
   push:
     tags:
       - "v*"
-      - "release-*"
 
 permissions:
   contents: write
@@ -40,7 +39,7 @@ jobs:
 
           mkdir -p "${DIST_ROOT}"
 
-          for path in app bootstrap config data public resources storage vendor cli.php composer.json composer.lock LICENSE README.md; do
+          for path in app bootstrap public resources storage vendor .htaccess cli.php composer.json composer.lock LICENSE README.md DEPLOYMENT.md; do
             if [ -e "${path}" ]; then
               cp -a "${path}" "${DIST_ROOT}/"
             fi
@@ -61,8 +60,11 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+          name: ${{ github.ref_name }}
           files: |
             blogme-${{ github.ref_name }}.zip
             blogme-${{ github.ref_name }}.zip.sha256
           overwrite_files: true
+          fail_on_unmatched_files: true
+          prerelease: ${{ contains(github.ref_name, '-') }}
           generate_release_notes: true
