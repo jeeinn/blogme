@@ -269,6 +269,39 @@
     </div>
 </form>
 
+<script>
+(function () {
+    const key = {=json_encode("blogme:post:edit:" . $ctx->Post->ID)}
+    let draft = null
+    try {
+        const raw = localStorage.getItem(key)
+        draft = raw ? JSON.parse(raw) : null
+    } catch (_) {
+        draft = null
+    }
+    if (!draft || typeof draft.content !== "string") {
+        return
+    }
+    const contentInput = document.querySelector("#content")
+    const currentContent = contentInput?.value ?? ""
+    if (draft.content === currentContent) {
+        return
+    }
+    const ok = window.confirm("检测到未保存草稿，是否恢复？")
+    if (!ok) {
+        try {
+            localStorage.removeItem(key)
+        } catch (_) {}
+        return
+    }
+    window.__blogmeDraft = draft
+    window.__blogmeDraftRestored = true
+    if (contentInput) {
+        contentInput.value = draft.content
+    }
+})();
+</script>
+
 <script type="module">
 import { initBlogmeCrepe } from {=$ctx->URL->RelativeRoot . 'admin/assets/editor-crepe.js'}
 
@@ -299,6 +332,10 @@ const data = {
     published_at: "",
     site_timezone: Number({=(int) ($ctx->Config->Timezone ?? 0)}),
     is_clear_cover: false,
+    autosave_key: {=json_encode("blogme:post:edit:" . $ctx->Post->ID)},
+    autosave_interval_id: null,
+    autosave_last_payload: "",
+    autosave_last_saved_at: 0,
     json_data: (() => {
         try {
             return JSON.parse({=$ctx->JSONData})
@@ -325,6 +362,7 @@ const data = {
     },
 
     onFormSubmit() {
+        this.saveDraftToStorage()
         // Ensure hidden unix timestamp is synchronized before submit.
         this.onPublishDateChange()
     },
@@ -400,18 +438,101 @@ const data = {
             + ':' + pad(d.getUTCMinutes())
     },
 
-    init() {
-        if (!this.json_data || typeof this.json_data !== "object") {
+    buildDraftPayload() {
+        const contentInput = document.querySelector("#content")
+        const excerptInput = document.querySelector("textarea[name='excerpt']")
+        const titleInput = document.querySelector("#title-input")
+        return {
+            version: 1,
+            updated_at: Date.now(),
+            title: titleInput?.value ?? "",
+            content: contentInput?.value ?? "",
+            visibility: this.visibility ?? "public",
+            tags: Array.isArray(this.tags) ? this.tags : [],
+            slug: this.slug ?? "",
+            excerpt: excerptInput?.value ?? "",
+            published_datetime: this.published_datetime ?? "",
+            published_at: this.published_at ?? "",
+        }
+    },
+
+    saveDraftToStorage() {
+        if (!window.localStorage) {
             return
         }
-        for (let key in this.json_data) {
-            this[key] = this.json_data[key]
+        const payload = this.buildDraftPayload()
+        const snapshot = JSON.stringify(payload)
+        if (snapshot === this.autosave_last_payload) {
+            return
         }
-        if (this.published_at !== "") {
-            this.published_datetime = this.formatDateTimeForSiteTimezone(Number(this.published_at))
-        } else if (this.published_datetime !== "") {
-            this.onPublishDateChange()
+        try {
+            localStorage.setItem(this.autosave_key, snapshot)
+            this.autosave_last_payload = snapshot
+            this.autosave_last_saved_at = payload.updated_at
+        } catch (_) {}
+    },
+
+    applyDraft(draft, { skipContent = false } = {}) {
+        if (!draft || typeof draft !== "object") {
+            return false
         }
+        const titleInput = document.querySelector("#title-input")
+        if (titleInput && typeof draft.title === "string") {
+            titleInput.value = draft.title
+        }
+        if (typeof draft.visibility === "string") {
+            this.visibility = draft.visibility
+        }
+        if (typeof draft.slug === "string") {
+            this.slug = draft.slug
+        }
+        if (Array.isArray(draft.tags)) {
+            this.tags = draft.tags
+            this.tags_str = this.tags.join(",")
+        }
+        if (typeof draft.published_datetime === "string") {
+            this.published_datetime = draft.published_datetime
+        }
+        if (typeof draft.published_at !== "undefined" && draft.published_at !== null) {
+            this.published_at = String(draft.published_at)
+        }
+        const excerptInput = document.querySelector("textarea[name='excerpt']")
+        if (excerptInput && typeof draft.excerpt === "string") {
+            excerptInput.value = draft.excerpt
+        }
+        if (!skipContent) {
+            const contentInput = document.querySelector("#content")
+            if (contentInput && typeof draft.content === "string") {
+                contentInput.value = draft.content
+            }
+        }
+        return true
+    },
+
+    startAutosave() {
+        if (this.autosave_interval_id) {
+            return
+        }
+        this.autosave_interval_id = window.setInterval(() => {
+            this.saveDraftToStorage()
+        }, 5000)
+    },
+
+    init() {
+        if (this.json_data && typeof this.json_data === "object") {
+            for (let key in this.json_data) {
+                this[key] = this.json_data[key]
+            }
+            if (this.published_at !== "") {
+                this.published_datetime = this.formatDateTimeForSiteTimezone(Number(this.published_at))
+            } else if (this.published_datetime !== "") {
+                this.onPublishDateChange()
+            }
+        }
+        if (window.__blogmeDraftRestored && window.__blogmeDraft) {
+            this.applyDraft(window.__blogmeDraft, { skipContent: true })
+        }
+        this.startAutosave()
     },
 }
 </script>
