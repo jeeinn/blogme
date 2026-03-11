@@ -2,8 +2,10 @@
     "filter_tag": "Show only posts with the tag:",
     "filter_author": "Show only posts by the author:",
     "filter_date": "Show only posts from the date:",
+    "filter_search": "Search results for:",
 
     "button_resetfilter": "Reset Filter",
+    "button_search": "Search",
     "button_menu": "Menu",
     "button_close": "Close",
     "button_editpost": "Edit Post",
@@ -23,6 +25,8 @@
 
     "notice_title": "Notice",
     "status_pinned": "Pinned",
+
+    "search_placeholder": "Search posts...",
 
     "password_title": "This Post is Locked",
     "password_description": "Enter the post password to unlock and view the content.",

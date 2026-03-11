@@ -47,6 +47,18 @@
                 <div class="ts-text is-center-aligned is-secondary has-top-spaced">
                     {=$ctx->Config->Description}
                 </div>
+                <form id="index-search" class="has-top-spaced-large" method="GET" action="{=$ctx->URL->RelativeRoot}" role="search">
+                    <div class="ts-grid is-middle-aligned">
+                        <div class="column is-fluid">
+                            <div class="ts-input is-fluid">
+                                <input type="search" name="q" placeholder="{=tr('search_placeholder')}" value="{=$ctx->Filter->Search}" aria-label="{=tr('search_placeholder')}" />
+                            </div>
+                        </div>
+                        <div class="column">
+                            <button type="submit" class="ts-button is-outlined">{=tr('button_search')}</button>
+                        </div>
+                    </div>
+                </form>
             </div>
         </div>
         <!-- / slate -->
@@ -63,6 +75,7 @@
                             {if $ctx->Filter->Tag}{=tr('filter_tag')}{=$ctx->Filter->Tag}{/if}
                             {if $ctx->Filter->Author}{=tr('filter_author')}{=$ctx->Filter->Author}{/if}
                             {if $ctx->Filter->Date}{=tr('filter_date')}{=$ctx->Filter->Date}{/if}
+                            {if $ctx->Filter->Search}{=tr('filter_search')}{=$ctx->Filter->Search}{/if}
                         </div>
                     </div>
                     <div class="column">

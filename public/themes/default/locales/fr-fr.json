@@ -2,8 +2,10 @@
     "filter_tag": "Afficher uniquement les publications avec le tag :",
     "filter_author": "Afficher uniquement les publications de l'auteur :",
     "filter_date": "Afficher uniquement les publications de la date :",
+    "filter_search": "Résultats de recherche :",
 
     "button_resetfilter": "Réinitialiser le filtre",
+    "button_search": "Rechercher",
     "button_menu": "Menu",
     "button_close": "Fermer",
     "button_editpost": "Modifier la publication",
@@ -23,6 +25,8 @@
 
     "notice_title": "Avis",
     "status_pinned": "Épinglé",
+
+    "search_placeholder": "Rechercher dans les articles...",
 
     "password_title": "Cette publication est verrouillée",
     "password_description": "Entrez le mot de passe pour déverrouiller et consulter le contenu.",

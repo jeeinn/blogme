@@ -2,8 +2,10 @@
     "filter_tag": "仅显示带有标签的文章：",
     "filter_author": "仅显示作者发布的文章：",
     "filter_date": "仅显示日期的文章：",
+    "filter_search": "搜索结果：",
 
     "button_resetfilter": "重置过滤器",
+    "button_search": "搜索",
     "button_menu": "菜单",
     "button_close": "关闭",
     "button_editpost": "编辑文章",
@@ -23,6 +25,8 @@
 
     "notice_title": "通知",
     "status_pinned": "置顶",
+
+    "search_placeholder": "搜索标题或内容...",
 
     "password_title": "此文章已锁定",
     "password_description": "请输入文章密码以解锁并查看内容。",

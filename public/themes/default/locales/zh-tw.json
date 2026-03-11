@@ -2,8 +2,10 @@
     "filter_tag": "只顯示有關標籤的文章：",
     "filter_author": "只顯示指定作者的文章：",
     "filter_date": "只顯示指定日期的文章：",
+    "filter_search": "搜尋結果：",
 
     "button_resetfilter": "重設條件",
+    "button_search": "搜尋",
     "button_menu": "選單",
     "button_close": "關閉",
     "button_editpost": "編輯文章",
@@ -23,6 +25,8 @@
 
     "notice_title": "通知",
     "status_pinned": "已置頂",
+
+    "search_placeholder": "搜尋標題或內容...",
 
     "password_title": "此文章已上鎖",
     "password_description": "輸入文章密碼以解鎖並觀看內容。",

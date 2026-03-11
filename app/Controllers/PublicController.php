@@ -21,15 +21,17 @@ final class PublicController extends BaseController
 
         $page = $this->queryPage();
         $perPage = (int) ($config['PostsPerPage'] ?? 10);
+        $search = trim((string) $this->request()->query('q', ''));
         $query = [
             'offset' => ($page - 1) * $perPage,
             'limit' => $perPage,
             'title' => (string) $this->request()->query('title', ''),
+            'query' => $search,
             'is_published' => true,
             'is_trashed' => false,
             'visibilities' => $self === null ? ['public', 'password'] : ['public', 'password', 'private'],
         ];
-        $filter = ['Tag' => '', 'Author' => '', 'Date' => '', 'IsEmpty' => true];
+        $filter = ['Tag' => '', 'Author' => '', 'Date' => '', 'Search' => '', 'IsEmpty' => true];
 
         if (($vars['tag'] ?? '') !== '') {
             $tag = $this->app->tags()->bySlug((string) $vars['tag']);
@@ -59,7 +61,10 @@ final class PublicController extends BaseController
                 }
             }
         }
-        $filter['IsEmpty'] = ($filter['Tag'] === '' && $filter['Author'] === '' && $filter['Date'] === '');
+        if ($search !== '') {
+            $filter['Search'] = $search;
+        }
+        $filter['IsEmpty'] = ($filter['Tag'] === '' && $filter['Author'] === '' && $filter['Date'] === '' && $filter['Search'] === '');
 
         $posts = $this->app->posts()->list($query, $config);
         $count = $this->app->posts()->count($query, $config);
