@@ -265,7 +265,7 @@ final class AdminController extends BaseController
         $now = time();
         echo $this->app->view()->renderAdmin('admin_settings', [
             ...$this->baseData($routePattern),
-            'Version' => '0.4.0-php',
+            'Version' => '0.4.1-php',
             'RuntimeVersion' => PHP_VERSION,
             'Timezones' => $this->availableTimezones(),
             'Locales' => $this->availableLocales(),
@@ -448,7 +448,7 @@ final class AdminController extends BaseController
             'tag_ids' => $tagIds,
         ]);
         $this->setMessage('notice_post_created');
-        \Blogme\Core\redirect('/admin/post/' . $id, 303);
+        \Blogme\Core\redirect('/admin/post/' . $id . '?created=1', 303);
     }
 
     public function postEditView(array $vars, string $routePattern): void
@@ -553,7 +553,7 @@ final class AdminController extends BaseController
             'tag_ids' => $this->createTags((string) $this->request()->post('tags', '')),
         ]);
         $this->setMessage('notice_post_updated');
-        \Blogme\Core\redirect('/admin/post/' . $id, 303);
+        \Blogme\Core\redirect('/admin/post/' . $id . '?updated=1', 303);
     }
 
     public function postTrash(array $vars, string $routePattern): void

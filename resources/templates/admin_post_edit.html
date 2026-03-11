@@ -2,6 +2,7 @@
 {block content}
 <link rel="stylesheet" href="{=$ctx->URL->RelativeRoot}admin/assets/editor-crepe.css" />
 <script src="{=$ctx->URL->RelativeRoot}admin/assets/alpine.min.js" defer></script>
+<script src="{=$ctx->URL->RelativeRoot}admin/assets/post-draft.js"></script>
 
 <form method="POST" enctype="multipart/form-data" x-data="data" x-on:submit="onFormSubmit">
     <input type="hidden" name="_csrf" value="{=$ctx->CSRF}" />
@@ -271,34 +272,28 @@
 
 <script>
 (function () {
-    const key = {=json_encode("blogme:post:edit:" . $ctx->Post->ID)}
-    let draft = null
-    try {
-        const raw = localStorage.getItem(key)
-        draft = raw ? JSON.parse(raw) : null
-    } catch (_) {
-        draft = null
-    }
-    if (!draft || typeof draft.content !== "string") {
-        return
-    }
-    const contentInput = document.querySelector("#content")
-    const currentContent = contentInput?.value ?? ""
-    if (draft.content === currentContent) {
-        return
-    }
-    const ok = window.confirm("检测到未保存草稿，是否恢复？")
-    if (!ok) {
-        try {
-            localStorage.removeItem(key)
-        } catch (_) {}
-        return
-    }
-    window.__blogmeDraft = draft
-    window.__blogmeDraftRestored = true
-    if (contentInput) {
-        contentInput.value = draft.content
-    }
+    window.__blogmeDraft = window.BlogmePostDraft.preparePage({
+        storageKey: {=json_encode("blogme:post:edit:" . $ctx->Post->ID)},
+        clearKeys: ["blogme:post:create"],
+        urlParamsToStrip: ["created", "updated"],
+        shouldClear(search) {
+            return search.get("created") === "1" || search.get("updated") === "1"
+        },
+        buildCurrentPayload() {
+            return {
+                title: document.querySelector("#title-input")?.value ?? "",
+                content: document.querySelector("#content")?.value ?? "",
+                slug: document.querySelector("input[name='slug']")?.value ?? "",
+                excerpt: document.querySelector("textarea[name='excerpt']")?.value ?? "",
+            }
+        },
+        applyDraftToDom(draft) {
+            const contentInput = document.querySelector("#content")
+            if (contentInput && typeof draft.content === "string") {
+                contentInput.value = draft.content
+            }
+        },
+    })
 })();
 </script>
 
@@ -332,10 +327,7 @@ const data = {
     published_at: "",
     site_timezone: Number({=(int) ($ctx->Config->Timezone ?? 0)}),
     is_clear_cover: false,
-    autosave_key: {=json_encode("blogme:post:edit:" . $ctx->Post->ID)},
-    autosave_interval_id: null,
-    autosave_last_payload: "",
-    autosave_last_saved_at: 0,
+    draft_manager: null,
     json_data: (() => {
         try {
             return JSON.parse({=$ctx->JSONData})
@@ -361,8 +353,14 @@ const data = {
         }
     },
 
+    onSlugChange() {
+        this.slug = String(this.slug ?? "").trim()
+    },
+
     onFormSubmit() {
-        this.saveDraftToStorage()
+        if (this.draft_manager) {
+            this.draft_manager.save(true)
+        }
         // Ensure hidden unix timestamp is synchronized before submit.
         this.onPublishDateChange()
     },
@@ -456,22 +454,6 @@ const data = {
         }
     },
 
-    saveDraftToStorage() {
-        if (!window.localStorage) {
-            return
-        }
-        const payload = this.buildDraftPayload()
-        const snapshot = JSON.stringify(payload)
-        if (snapshot === this.autosave_last_payload) {
-            return
-        }
-        try {
-            localStorage.setItem(this.autosave_key, snapshot)
-            this.autosave_last_payload = snapshot
-            this.autosave_last_saved_at = payload.updated_at
-        } catch (_) {}
-    },
-
     applyDraft(draft, { skipContent = false } = {}) {
         if (!draft || typeof draft !== "object") {
             return false
@@ -509,15 +491,6 @@ const data = {
         return true
     },
 
-    startAutosave() {
-        if (this.autosave_interval_id) {
-            return
-        }
-        this.autosave_interval_id = window.setInterval(() => {
-            this.saveDraftToStorage()
-        }, 5000)
-    },
-
     init() {
         if (this.json_data && typeof this.json_data === "object") {
             for (let key in this.json_data) {
@@ -529,10 +502,16 @@ const data = {
                 this.onPublishDateChange()
             }
         }
-        if (window.__blogmeDraftRestored && window.__blogmeDraft) {
+        this.draft_manager = window.BlogmePostDraft.createManager({
+            storageKey: {=json_encode("blogme:post:edit:" . $ctx->Post->ID)},
+            getStableValue: () => document.querySelector("#content")?.value ?? "",
+            buildPayload: () => this.buildDraftPayload(),
+        })
+        if (window.__blogmeDraft) {
+            this.draft_manager.restored = true
             this.applyDraft(window.__blogmeDraft, { skipContent: true })
         }
-        this.startAutosave()
+        this.draft_manager.start()
     },
 }
 </script>
