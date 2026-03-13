@@ -326,7 +326,7 @@ final class PostRepository
                     'Email' => (string) $row['email'],
                     'Bio' => (string) $row['bio'],
                     'CreatedAt' => (int) $row['user_created_at'],
-                    'Gravatar' => 'http://www.gravatar.com/avatar/' . md5(strtolower(trim((string) $row['email']))),
+                    'Gravatar' => 'https://cn.cravatar.com/avatar/' . md5(strtolower(trim((string) $row['email']))),
                 ],
             ];
             $tags = $this->tags->byPost($id);

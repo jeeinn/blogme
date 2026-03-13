@@ -80,7 +80,7 @@ final class UserRepository
         $row['Nickname'] = $row['nickname'];
         $row['Password'] = $row['password'];
         $row['Bio'] = $row['bio'];
-        $row['Gravatar'] = 'http://www.gravatar.com/avatar/' . md5(strtolower(trim((string) $row['email'])));
+        $row['Gravatar'] = 'https://cn.cravatar.com/avatar/' . md5(strtolower(trim((string) $row['email'])));
         return $row;
     }
 }

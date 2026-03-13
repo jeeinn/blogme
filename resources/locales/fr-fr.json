@@ -210,7 +210,7 @@
 
     "useredit_useredit": "Modifier l'utilisateur",
     "useredit_avatar": "Avatar",
-    "useredit_avatar_description": "Cet avatar peut être modifié sur <a class='ts-text is-external-link' href='https://gravatar.com/' target='_blank'>Gravatar</a>.",
+    "useredit_avatar_description": "Cet avatar peut être modifié sur <a class='ts-text is-external-link' href='https://cravatar.com/' target='_blank'>Cravatar</a>.",
 
     "useredit_password_description": "Laissez vide pour ne pas apporter de modifications.",
     "useredit_bio": "Biographie",
