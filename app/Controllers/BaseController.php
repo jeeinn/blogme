@@ -78,14 +78,20 @@ abstract class BaseController
     protected function baseData(string $routePattern): array
     {
         $self = $this->currentUser();
-        $config = $this->app->config();
+        $config = $this->app->config() ?? [];
         $relativeRoot = $this->app->routeRelativeRoot($routePattern);
         $absolute = $this->request()->scheme() . '://' . $this->request()->host() . $this->request()->path();
+        $seoLang = $this->normalizeLocaleTag((string) ($config['Locale'] ?? 'en-us'));
+        $seoOgLocale = $this->normalizeOgLocale($seoLang);
         return [
             'Self' => $self,
             'Config' => $config,
             'Message' => $this->getMessage(),
             'CSRF' => $this->app->csrf()->token(),
+            'SEO' => [
+                'Lang' => $seoLang,
+                'OgLocale' => $seoOgLocale,
+            ],
             'URL' => [
                 'Root' => $this->request()->scheme() . '://' . $this->request()->host() . '/',
                 'Absolute' => $absolute,
@@ -134,6 +140,46 @@ abstract class BaseController
         $value = str_replace(' ', '-', $value);
         $value = preg_replace("/[^A-Za-z0-9\\-._~!$&'()*+,;=\\p{L}\\p{N}]/u", '', $value) ?? $value;
         return $value;
+    }
+
+    protected function normalizeLocaleTag(string $locale): string
+    {
+        $locale = trim($locale);
+        if ($locale === '') {
+            return 'en-US';
+        }
+        $locale = str_replace('_', '-', $locale);
+        $parts = array_values(array_filter(explode('-', $locale), static fn (string $part): bool => $part !== ''));
+        if ($parts === []) {
+            return 'en-US';
+        }
+        $normalized = [strtolower($parts[0])];
+        $count = count($parts);
+        for ($i = 1; $i < $count; $i++) {
+            $part = $parts[$i];
+            if ($part === '') {
+                continue;
+            }
+            if (strlen($part) === 2 && ctype_alpha($part)) {
+                $normalized[] = strtoupper($part);
+                continue;
+            }
+            if (strlen($part) === 4 && ctype_alpha($part)) {
+                $normalized[] = strtoupper($part[0]) . strtolower(substr($part, 1));
+                continue;
+            }
+            if (strlen($part) === 3 && ctype_digit($part)) {
+                $normalized[] = $part;
+                continue;
+            }
+            $normalized[] = strtolower($part);
+        }
+        return implode('-', $normalized);
+    }
+
+    protected function normalizeOgLocale(string $langTag): string
+    {
+        return str_replace('-', '_', $langTag);
     }
 
     /** @return array<int, string> */

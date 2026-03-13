@@ -1,20 +1,42 @@
 <!DOCTYPE html>
-<html class="{if $ctx->Config->ContainerWidth}container-{=$ctx->Config->ContainerWidth}{/if} text-{=$ctx->Config->FontSize} font-{=$ctx->Config->FontFamily} {if $ctx->Config->ColorScheme}is-{=$ctx->Config->ColorScheme}{/if}">
+<html class="{if $ctx->Config->ContainerWidth}container-{=$ctx->Config->ContainerWidth}{/if} text-{=$ctx->Config->FontSize} font-{=$ctx->Config->FontFamily} {if $ctx->Config->ColorScheme}is-{=$ctx->Config->ColorScheme}{/if}" lang="{=$ctx->SEO->Lang}">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{=$ctx->Config->Name}</title>
-    <meta name="description" content="{=$ctx->Config->Description}">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>页面未找到 - {=$ctx->Config->Name}</title>
+    <meta name="description" content="抱歉，您访问的页面不存在。{=$ctx->Config->Description}">
+    <meta name="robots" content="noindex, follow">
+    
     <!-- og -->
     <meta property="og:site_name" content="{=$ctx->Config->Name}" />
     <meta property="og:url" content="{=$ctx->URL->Absolute}" />
-    <meta property="og:description" content="{=$ctx->Config->Description}" />
+    <meta property="og:title" content="页面未找到 - {=$ctx->Config->Name}" />
+    <meta property="og:description" content="抱歉，您访问的页面不存在。{=$ctx->Config->Description}" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="{=$ctx->SEO->OgLocale}" />
     <!-- / og -->
+    
     <link rel="stylesheet" href="{=$ctx->URL->AbsoluteHost}themes/{=(string) ($ctx->Config->Theme ?? 'default')}/assets/tocas.min.css" />
     <script src="{=$ctx->URL->AbsoluteHost}themes/{=(string) ($ctx->Config->Theme ?? 'default')}/assets/tocas.min.js"></script>
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <link rel="stylesheet" href="{=$ctx->URL->AbsoluteHost}themes/{=(string) ($ctx->Config->Theme ?? 'default')}/assets/style.css" />
     <link rel="icon" type="image/png" href="{=$ctx->URL->AbsoluteHost}themes/{=(string) ($ctx->Config->Theme ?? 'default')}/assets/favicon.png">
+    
+    <!-- 结构化数据 -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebPage",
+        "name": {=json_encode("页面未找到")},
+        "description": {=json_encode("抱歉，您访问的页面不存在。")},
+        "url": {=json_encode($ctx->URL->Absolute)},
+        "publisher": {
+            "@type": "Organization",
+            "name": {=json_encode($ctx->Config->Name)}
+        }
+    }
+    </script>
+    <!-- / 结构化数据 -->
+    
     {=$ctx->Config->InjectedHead|html}
 </head>
 <body id="page">

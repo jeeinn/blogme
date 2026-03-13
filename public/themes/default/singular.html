@@ -1,36 +1,92 @@
 <!DOCTYPE html>
-<html class="{if $ctx->Config->ContainerWidth}container-{=$ctx->Config->ContainerWidth}{/if} text-{=$ctx->Config->FontSize} font-{=$ctx->Config->FontFamily} {if $ctx->Config->ColorScheme}is-{=$ctx->Config->ColorScheme}{/if}">
+<html class="{if $ctx->Config->ContainerWidth}container-{=$ctx->Config->ContainerWidth}{/if} text-{=$ctx->Config->FontSize} font-{=$ctx->Config->FontFamily} {if $ctx->Config->ColorScheme}is-{=$ctx->Config->ColorScheme}{/if}" lang="{=$ctx->SEO->Lang}">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{=$ctx->Post->Title} - {=$ctx->Config->Name}</title>
+    <meta name="description" content="{if $ctx->IsUnlocked}{=$ctx->Post->Excerpt}{else}{=$ctx->Config->Description}{/if}">
     {if $ctx->IsUnlocked}
-    <meta name="description" content="{=$ctx->Post->Excerpt}">
-    <meta property="og:description" content="{=$ctx->Post->Excerpt}" />
+    <meta name="keywords" content="{foreach $ctx->Post->Tags as $dot1}{=$dot1->Name}{if !$iterator->last},{/if}{/foreach}">
     {/if}
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="{=$ctx->URL->Absolute}">
+    
     <!-- og -->
     <meta property="og:title" content="{=$ctx->Post->Title}" />
     <meta property="og:site_name" content="{=$ctx->Config->Name}" />
     <meta property="og:url" content="{=$ctx->URL->Absolute}" />
+    <meta property="og:description" content="{if $ctx->IsUnlocked}{=$ctx->Post->Excerpt}{else}{=$ctx->Config->Description}{/if}" />
     {if $ctx->Post->Cover}
     <meta property="og:image" content="{=$ctx->URL->Root}/{=$ctx->Post->Cover}" />
+    <meta property="og:image:alt" content="{=$ctx->Post->Title}" />
     {/if}
     <meta property="og:type" content="article" />
+    <meta property="og:locale" content="{=$ctx->SEO->OgLocale}" />
     <meta property="article:published_time" content="{=$ctx->Post->PublishedDate}" />
+    <meta property="article:modified_time" content="{=$ctx->Post->UpdatedDate}" />
     <meta property="article:author" content="{=$ctx->Post->Author->Nickname}" />
     {foreach $ctx->Post->Tags as $dot1}
     <meta property="article:tag" content="{=$dot1->Name}" />
     {/foreach}
     <!-- / og -->
+    
+    <!-- twitter card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{=$ctx->Post->Title}">
+    <meta name="twitter:description" content="{if $ctx->IsUnlocked}{=$ctx->Post->Excerpt}{else}{=$ctx->Config->Description}{/if}">
+    {if $ctx->Post->Cover}
+    <meta name="twitter:image" content="{=$ctx->URL->Root}/{=$ctx->Post->Cover}">
+    {/if}
+    <!-- / twitter card -->
+    
     <link rel="stylesheet" href="{=$ctx->URL->RelativeRoot}themes/{=(string) ($ctx->Config->Theme ?? 'default')}/assets/tocas.min.css" />
     <script src="{=$ctx->URL->RelativeRoot}themes/{=(string) ($ctx->Config->Theme ?? 'default')}/assets/tocas.min.js"></script>
     {if $ctx->Config->HighlightJS}
     <link rel="stylesheet" href="{=$ctx->URL->RelativeRoot}themes/{=(string) ($ctx->Config->Theme ?? 'default')}/assets/highlight.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
     {/if}
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <link rel="stylesheet" href="{=$ctx->URL->RelativeRoot}themes/{=(string) ($ctx->Config->Theme ?? 'default')}/assets/style.css" />
     <link rel="icon" type="image/png" href="{=$ctx->URL->RelativeRoot}themes/{=(string) ($ctx->Config->Theme ?? 'default')}/assets/favicon.png">
+    <link rel="sitemap" type="application/xml" title="Sitemap" href="{=$ctx->URL->AbsoluteHost}sitemap.xml" />
+    
+    <!-- 结构化数据 -->
+    {if $ctx->IsUnlocked}
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BlogPosting",
+        "headline": {=json_encode($ctx->Post->Title)},
+        "description": {=json_encode($ctx->Post->Excerpt)},
+        "author": {
+            "@type": "Person",
+            "name": {=json_encode($ctx->Post->Author->Nickname)}
+        },
+        "datePublished": {=json_encode($ctx->Post->PublishedDate)},
+        "dateModified": {=json_encode($ctx->Post->UpdatedDate)},
+        "publisher": {
+            "@type": "Organization",
+            "name": {=json_encode($ctx->Config->Name)}
+        },
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": {=json_encode($ctx->URL->Absolute)}
+        }
+        {if $ctx->Post->Cover},
+        "image": {
+            "@type": "ImageObject",
+            "url": {=json_encode($ctx->URL->Root . $ctx->Post->Cover)},
+            "width": 1200,
+            "height": 630
+        }
+        {/if}
+        {if $ctx->Post->Tags},
+        "keywords": [{foreach $ctx->Post->Tags as $dot2}{=json_encode($dot2->Name)}{if !$iterator->last},{/if}{/foreach}]
+        {/if}
+    }
+    </script>
+    {/if}
+    <!-- / 结构化数据 -->
+    
     {=$ctx->Config->InjectedHead|html}
 </head>
 <body id="page">
@@ -79,7 +135,7 @@
             <!-- cover -->
             {if $ctx->Post->Cover}
             <div id="singular-cover" class="ts-image is-rounded is-16-by-9 tablet+:has-top-spaced-big mobile:has-top-spaced-large">
-                <img src="{=$ctx->Post->Cover}" />
+                <img src="{=$ctx->Post->Cover}" alt="{=$ctx->Post->Title}" />
             </div>
             {/if}
             <!-- / cover -->
@@ -101,13 +157,13 @@
             <!-- / date -->
 
             <!-- title -->
-            <div class="ts-header is-heavy tablet+:is-massive mobile:is-big">
+            <h1 class="ts-header is-heavy tablet+:is-massive mobile:is-big">
                 {if eq($ctx->Post->Visibility, 'private')}{=tr('title_private')}{/if}
                 {if eq($ctx->Post->Visibility, 'draft')}{=tr('title_draft')}{/if}
                 {if eq($ctx->Post->Visibility, 'password')}{=tr('title_password')}{/if}
                 {=$ctx->Post->Title}
                 {if bool_not($ctx->Post->IsPublished)}{=tr('title_scheduled')}{/if}
-            </div>
+            </h1>
             <!-- / title -->
 
             <div class="ts-divider has-top-spaced-large"></div>

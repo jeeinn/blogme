@@ -166,7 +166,7 @@
                                 <div class="ts-content">
                                     <div class="ts-wrap is-compact">
                                         {foreach $ctx->MostUsedTags as $dot2}
-                                        <button type="button" class="ts-text is-link is-undecorated" x-on:click="addTag('{=$dot2->Name}')">#{=$dot2->Name}</button>
+                                        <button type="button" class="ts-text is-link is-undecorated" x-on:click="addTag({=json_encode($dot2->Name)})">#{=$dot2->Name}</button>
                                         {/foreach}
                                     </div>
                                 </div>

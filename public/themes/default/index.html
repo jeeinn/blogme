@@ -1,23 +1,54 @@
 <!DOCTYPE html>
-<html class="{if $ctx->Config->ContainerWidth}container-{=$ctx->Config->ContainerWidth}{/if} text-{=$ctx->Config->FontSize} font-{=$ctx->Config->FontFamily} {if $ctx->Config->ColorScheme}is-{=$ctx->Config->ColorScheme}{/if}">
+<html class="{if $ctx->Config->ContainerWidth}container-{=$ctx->Config->ContainerWidth}{/if} text-{=$ctx->Config->FontSize} font-{=$ctx->Config->FontFamily} {if $ctx->Config->ColorScheme}is-{=$ctx->Config->ColorScheme}{/if}" lang="{=$ctx->SEO->Lang}">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{=$ctx->Config->Name}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{=$ctx->Config->Name}{if $ctx->Filter->Search} - 搜索 "{=$ctx->Filter->Search}"{/if}{if $ctx->Filter->Tag} - 标签 "{=$ctx->Filter->Tag}"{/if}{if $ctx->Filter->Author} - 作者 "{=$ctx->Filter->Author}"{/if}{if $ctx->Pagination->CurrentPage > 1} - 第 {=$ctx->Pagination->CurrentPage} 页{/if}</title>
     <meta name="description" content="{=$ctx->Config->Description}">
+    <meta name="keywords" content="{if $ctx->Filter->Tag}{=$ctx->Filter->Tag}{else}博客,文章,技术{/if}">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="{=$ctx->URL->Absolute}">
+    
     <!-- og -->
     <meta property="og:site_name" content="{=$ctx->Config->Name}" />
     <meta property="og:url" content="{=$ctx->URL->Absolute}" />
+    <meta property="og:title" content="{=$ctx->Config->Name}{if $ctx->Filter->Search} - 搜索 &quot;{=$ctx->Filter->Search}&quot;{/if}{if $ctx->Filter->Tag} - 标签 &quot;{=$ctx->Filter->Tag}&quot;{/if}{if $ctx->Filter->Author} - 作者 &quot;{=$ctx->Filter->Author}&quot;{/if}{if $ctx->Pagination->CurrentPage > 1} - 第 {=$ctx->Pagination->CurrentPage} 页{/if}" />
     <meta property="og:description" content="{=$ctx->Config->Description}" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="{=$ctx->SEO->OgLocale}" />
     <!-- / og -->
+    
+    <!-- twitter card -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="{=$ctx->Config->Name}{if $ctx->Filter->Search} - 搜索 &quot;{=$ctx->Filter->Search}&quot;{/if}{if $ctx->Filter->Tag} - 标签 &quot;{=$ctx->Filter->Tag}&quot;{/if}{if $ctx->Filter->Author} - 作者 &quot;{=$ctx->Filter->Author}&quot;{/if}{if $ctx->Pagination->CurrentPage > 1} - 第 {=$ctx->Pagination->CurrentPage} 页{/if}">
+    <meta name="twitter:description" content="{=$ctx->Config->Description}">
+    <!-- / twitter card -->
+    
     <link rel="stylesheet" href="{=$ctx->URL->RelativeRoot}themes/{=(string) ($ctx->Config->Theme ?? 'default')}/assets/tocas.min.css" />
     <script src="{=$ctx->URL->RelativeRoot}themes/{=(string) ($ctx->Config->Theme ?? 'default')}/assets/tocas.min.js"></script>
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <link rel="stylesheet" href="{=$ctx->URL->RelativeRoot}themes/{=(string) ($ctx->Config->Theme ?? 'default')}/assets/style.css" />
     <link rel="icon" type="image/png" href="{=$ctx->URL->RelativeRoot}themes/{=(string) ($ctx->Config->Theme ?? 'default')}/assets/favicon.png">
     <!-- RSS -->
     <link rel="alternate" type="application/rss+xml" title="{=$ctx->Config->Name}" href="{=$ctx->URL->RelativeRoot}/rss.xml" />
+    <link rel="sitemap" type="application/xml" title="Sitemap" href="{=$ctx->URL->AbsoluteHost}sitemap.xml" />
     <!-- / RSS -->
+    
+    <!-- 结构化数据 -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Blog",
+        "name": {=json_encode($ctx->Config->Name)},
+        "description": {=json_encode($ctx->Config->Description)},
+        "url": {=json_encode($ctx->URL->Absolute)},
+        "publisher": {
+            "@type": "Organization",
+            "name": {=json_encode($ctx->Config->Name)}
+        }
+    }
+    </script>
+    <!-- / 结构化数据 -->
+    
     {=$ctx->Config->InjectedHead|html}
 </head>
 <body id="page">
@@ -41,9 +72,9 @@
         <!-- slate -->
         <div class="ts-content is-secondary is-horizontally-fitted tablet+:has-vertically-padded-huge mobile:has-vertically-padded-big">
             <div class="ts-container">
-                <a href="{=$ctx->URL->RelativeRoot}./" class="ts-header is-heavy is-center-aligned tablet+:is-massive mobile:is-big">
-                    {=$ctx->Config->Name}
-                </a>
+                <h1 class="ts-header is-heavy is-center-aligned tablet+:is-massive mobile:is-big">
+                    <a href="{=$ctx->URL->RelativeRoot}./" class="is-undecorated">{=$ctx->Config->Name}</a>
+                </h1>
                 <div class="ts-text is-center-aligned is-secondary has-top-spaced">
                     {=$ctx->Config->Description}
                 </div>

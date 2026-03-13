@@ -2,7 +2,7 @@
     <div class="ts-grid {if bool_not($ctx->Post->Author->Bio)}is-middle-aligned{/if}">
         <div class="column">
             <a href="{=$ctx->URL->RelativeRoot}author/{=$ctx->Post->Author->ID}" class="ts-image is-circular">
-                <img src="{=$ctx->Post->Author->Gravatar}" width="60" />
+                <img src="{=$ctx->Post->Author->Gravatar}" width="60" alt="{=$ctx->Post->Author->Nickname}" />
             </a>
         </div>
         <div class="column is-fluid">
