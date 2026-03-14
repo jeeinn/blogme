@@ -170,7 +170,7 @@
 
             <!-- content -->
             {if $ctx->IsUnlocked}
-                {=$ctx->Config->InjectedPostStart}
+                {=$ctx->Config->InjectedPostStart|html}
 
                 {if eq($ctx->Config->AuthorBlock, 'start')}
                     {include 'author.html'}
@@ -192,7 +192,7 @@
                     {include 'author.html'}
                 {/if}
 
-                {=$ctx->Config->InjectedPostEnd}
+                {=$ctx->Config->InjectedPostEnd|html}
             {else}
                 <!-- locked -->
                 {if $ctx->Message}
