@@ -349,7 +349,7 @@ final class AdminController extends BaseController
         $this->guard();
         $config = $this->app->config() ?? [];
         $page = $this->queryPage();
-        $countPerPage = 30;
+        $countPerPage = $config['PostsPerPage'] ?? 10;
         $visibility = (string) $this->request()->query('visibility', '');
         $query = [
             'offset' => ($page - 1) * $countPerPage,
