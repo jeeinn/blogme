@@ -43,7 +43,6 @@
     <script src="{=$ctx->URL->RelativeRoot}themes/{=(string) ($ctx->Config->Theme ?? 'default')}/assets/tocas.min.js"></script>
     {if $ctx->Config->HighlightJS}
     <link rel="stylesheet" href="{=$ctx->URL->RelativeRoot}themes/{=(string) ($ctx->Config->Theme ?? 'default')}/assets/highlight.css" />
-    <script src="{=$ctx->URL->RelativeRoot}themes/{=(string) ($ctx->Config->Theme ?? 'default')}/assets/highlight.min.js"></script>
     {/if}
     <link rel="stylesheet" href="{=$ctx->URL->RelativeRoot}themes/{=(string) ($ctx->Config->Theme ?? 'default')}/assets/style.css" />
     <link rel="icon" type="image/png" href="{=$ctx->URL->RelativeRoot}themes/{=(string) ($ctx->Config->Theme ?? 'default')}/assets/favicon.png">
@@ -268,18 +267,15 @@
     {/if}
     <!-- / footer -->
 
-    {if $ctx->Config->HighlightJS}
-    <script>
-        if (window.hljs) {
-            window.hljs.highlightAll()
-        }
-    </script>
-    {/if}
-
     {if $ctx->IsUnlocked}
-        {if ($ctx->Config->Mermaid ?? true)}
-        <script type="module" src="{=$ctx->URL->RelativeRoot}themes/{=(string) ($ctx->Config->Theme ?? 'default')}/assets/mermaid-page.js"></script>
-        {/if}
+        <script
+            src="{=$ctx->URL->RelativeRoot}themes/{=(string) ($ctx->Config->Theme ?? 'default')}/assets/post-runtime.js"
+            defer
+            data-highlight-enabled="{if $ctx->Config->HighlightJS}true{else}false{/if}"
+            data-mermaid-enabled="{if ($ctx->Config->Mermaid ?? true)}true{else}false{/if}"
+            data-highlight-src="{=$ctx->URL->RelativeRoot}themes/{=(string) ($ctx->Config->Theme ?? 'default')}/assets/highlight.min.js"
+            data-mermaid-src="{=$ctx->URL->RelativeRoot}themes/{=(string) ($ctx->Config->Theme ?? 'default')}/assets/mermaid-page.js"
+        ></script>
     {/if}
 
     {=$ctx->Config->InjectedFoot|html}
