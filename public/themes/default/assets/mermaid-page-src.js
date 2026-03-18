@@ -26,6 +26,9 @@ const sanitizeSvg = svg => DOMPurify.sanitize(svg, {
     },
 });
 
+const isMermaidCodeBlock = codeBlock => Array.from(codeBlock.classList)
+    .some(className => className.toLowerCase() === "language-mermaid");
+
 const renderDiagram = async (codeBlock, index) => {
     const container = document.createElement("div");
     container.className = "mermaid-diagram";
@@ -52,7 +55,8 @@ const renderMermaidBlocks = async () => {
         return;
     }
 
-    const codeBlocks = Array.from(root.querySelectorAll("pre > code.language-mermaid"));
+    const codeBlocks = Array.from(root.querySelectorAll("pre > code"))
+        .filter(isMermaidCodeBlock);
     if (codeBlocks.length === 0) {
         return;
     }
