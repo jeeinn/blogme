@@ -323,6 +323,7 @@ final class AdminController extends BaseController
         $config['FontFamily'] = trim((string) $this->request()->post('font_family', 'sans'));
         $config['FontSize'] = trim((string) $this->request()->post('font_size', 'medium'));
         $config['HighlightJS'] = $this->toBool($this->request()->post('highlight_js', ''));
+        $config['Mermaid'] = $this->toBool($this->request()->post('mermaid', 'true'));
         $config['AuthorBlock'] = trim((string) $this->request()->post('author_block', 'start'));
         $config['PostsPerPage'] = (int) $this->request()->post('posts_per_page', 10);
         $config['Theme'] = $theme;

@@ -1,6 +1,76 @@
 import { Crepe } from "@milkdown/crepe";
+import { LanguageDescription, LanguageSupport, StreamLanguage } from "@codemirror/language";
+import { commandsCtx } from "@milkdown/kit/core";
+import {
+    clearTextInCurrentBlockCommand,
+    codeBlockSchema,
+    setBlockTypeCommand,
+} from "@milkdown/kit/preset/commonmark";
+import mermaid from "mermaid";
 import "./editor-crepe-theme.css";
 import "@milkdown/crepe/theme/frame.css";
+
+const MERMAID_ICON = `
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+  <path d="M4 17V7l4 5 4-5v10" />
+  <path d="M14 17V7l3 3 3-3v10" />
+</svg>
+`;
+
+const mermaidCodeMirrorSupport = new LanguageSupport(
+    StreamLanguage.define({
+        name: "Mermaid",
+        token: stream => {
+            stream.skipToEnd();
+            return null;
+        },
+    })
+);
+
+const mermaidLanguage = LanguageDescription.of({
+    name: "Mermaid",
+    alias: ["mermaid", "mmd"],
+    extensions: ["mmd"],
+    support: mermaidCodeMirrorSupport,
+});
+
+let mermaidInitialized = false;
+let mermaidRenderIndex = 0;
+
+const ensureMermaid = () => {
+    if (mermaidInitialized) {
+        return;
+    }
+
+    mermaid.initialize({
+        startOnLoad: false,
+        securityLevel: "strict",
+        theme: "default",
+        fontFamily: "inherit",
+        htmlLabels: false,
+    });
+    mermaidInitialized = true;
+};
+
+const renderMermaidSvg = async source => {
+    ensureMermaid();
+    const diagramId = `blogme-mermaid-${mermaidRenderIndex++}`;
+    const { svg } = await mermaid.render(diagramId, source);
+    return svg;
+};
+
+const insertMermaidBlock = ctx => {
+    const commands = ctx.get(commandsCtx);
+    const codeBlock = codeBlockSchema.type(ctx);
+
+    commands.call(clearTextInCurrentBlockCommand.key);
+    commands.call(setBlockTypeCommand.key, {
+        nodeType: codeBlock,
+        attrs: {
+            language: "mermaid",
+        },
+    });
+};
 
 const buildUnsavedHandler = () => event => {
     event.preventDefault();
@@ -76,15 +146,45 @@ export const initBlogmeCrepe = async (options = {}) => {
     };
 
     const imageUpload = async file => uploadImage(file, uploadUrl, csrfToken, urlRoot);
-    const featureConfigs = uploadUrl === ""
-        ? undefined
-        : {
-            [Crepe.Feature.ImageBlock]: {
-                onUpload: imageUpload,
-                inlineOnUpload: imageUpload,
-                blockOnUpload: imageUpload,
+    const featureConfigs = {
+        [Crepe.Feature.CodeMirror]: {
+            languages: [mermaidLanguage],
+            renderPreview: (language, content, applyPreview) => {
+                if (language.trim().toLowerCase() !== "mermaid") {
+                    return null;
+                }
+
+                const source = content.trim();
+                if (source === "") {
+                    return null;
+                }
+
+                void renderMermaidSvg(source)
+                    .then(applyPreview)
+                    .catch(() => {
+                        applyPreview(null);
+                    });
+                return undefined;
             },
+        },
+        [Crepe.Feature.BlockEdit]: {
+            buildMenu: builder => {
+                builder.getGroup("advanced").addItem("mermaid", {
+                    label: "Mermaid",
+                    icon: MERMAID_ICON,
+                    onRun: insertMermaidBlock,
+                });
+            },
+        },
+    };
+
+    if (uploadUrl !== "") {
+        featureConfigs[Crepe.Feature.ImageBlock] = {
+            onUpload: imageUpload,
+            inlineOnUpload: imageUpload,
+            blockOnUpload: imageUpload,
         };
+    }
 
     const crepe = new Crepe({
         root: holder,

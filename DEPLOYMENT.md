@@ -53,12 +53,27 @@ php cli.php migrate
   - `config.json` 已生成
   - 后台可登录
 
+## 4.1 前端构建资源发布原则
+
+- 生产环境默认使用仓库内已构建好的静态资源，不要求服务器安装 Node.js 或 npm。
+- 若修改了后台编辑器或前台 Mermaid 渲染逻辑，应在本地或 CI 执行构建后，再上传产物到服务器。
+- 这些资源必须以物理文件形式部署在 `public/` 下，由 Nginx/Apache 直接返回，不通过 PHP 路由转发输出。
+- 当前相关命令：
+  - `npm run build:admin-editor`
+  - `npm run build:theme-mermaid`
+- 上传时应整体同步以下目录，而不是仅替换单个入口文件：
+  - `public/admin/assets/`
+  - `public/themes/default/assets/`
+- 这样可以兼容共享虚拟空间场景，也能为后续可能引入的静态分包保留部署余量。
+
 ## 5. 共享主机注意事项
 
 - 若不能设置 DocumentRoot 到 `public/`：
   - 需将 `public/index.php` 作为入口并调整相对路径，或通过主机面板映射子目录为网站根
 - 若禁用 `exec`：不影响本项目核心运行
 - 若禁用 `gd`：图片将不进行压缩，仅保存原图
+- 若无法在服务器执行 Node.js 构建：
+  - 直接上传本地已编译好的 `public/admin/assets/` 与 `public/themes/default/assets/` 即可，不影响 Mermaid 功能运行
 
 ## 6. 性能与稳定性建议
 
@@ -73,6 +88,8 @@ php cli.php migrate
   - `/themes/*`
   - `/admin/assets/*`
   - `/uploads/*`（按业务策略）
+- 若静态资源有版本更新：
+  - 建议整目录覆盖上传，避免旧文件与新构建产物混用
 - 备份与恢复可参考：
   - [docs/backup-and-restore.md](./docs/backup-and-restore.md)
 

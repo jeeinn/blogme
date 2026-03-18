@@ -63,6 +63,13 @@ npm run build:admin-editor
 - 升级 `@milkdown/crepe` 版本
 - 调整打包参数（`package.json` 中 `build:admin-editor`）
 
+5. 生产部署约束
+
+- 仓库默认提交已编译好的后台资源，生产环境不要求安装 Node.js。
+- 共享虚拟空间建议在本地或 CI 完成编译后，整体上传 `public/admin/assets/`。
+- 后台静态资源应由 Web 服务器直接返回，不通过 PHP 路由输出。
+- 不要只替换 `editor-crepe.js`；构建可能同时更新 `editor-crepe.css` 与 `editor-assets/*`。
+
 ## 4. 前端接入方式
 
 ### 4.1 编辑器容器
@@ -101,6 +108,12 @@ Crepe 的 `image-block` 上传钩子绑定现有接口 `/admin/photos/api`：
   - 在 `editor-crepe-src.js` 中将 `Crepe.Feature.Latex` 设为 `true`（或移除禁用配置）。
   - 在 `editor-crepe-theme.css` 中恢复 `latex.css` 相关样式引入。
   - 重新执行 `npm run build:admin-editor`。
+
+### 4.6 Mermaid 说明
+
+- 后台 Mermaid 预览属于运行时增强，不改变 `posts.content` 的 Markdown 持久化模型。
+- 若调整 Mermaid 预览逻辑，需要同步关注前台 `public/themes/default/assets/mermaid-page-src.js` 的渲染行为，保证“编辑器预览”和“文章页渲染”语义一致。
+- 相关静态资源部署约束见：[`docs/mermaid-runtime-assets.md`](./mermaid-runtime-assets.md)
 
 ## 5. 不变项（必须保持）
 
