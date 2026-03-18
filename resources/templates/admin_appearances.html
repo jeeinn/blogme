@@ -130,6 +130,27 @@
                 </div>
                 <!-- / highlight_js -->
 
+                <!-- mermaid -->
+                <div class="ts-control has-top-spaced-large">
+                    <div class="label">{=tr('appearances_mermaid')}</div>
+                    <div class="content is-padded">
+                        <div class="ts-wrap is-vertical is-compact">
+                            <label class="ts-radio">
+                                <input name="mermaid" type="radio" value="true" {if ($ctx->Config->Mermaid ?? true)}checked{/if} />
+                                {=tr('appearances_mermaid_true')}
+                            </label>
+                            <label class="ts-radio">
+                                <input name="mermaid" type="radio" value="false" {if bool_not(($ctx->Config->Mermaid ?? true))}checked{/if} />
+                                {=tr('appearances_mermaid_false')}
+                            </label>
+                            <div class="ts-text is-description">
+                                {=tr('appearances_mermaid_description')}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- / mermaid -->
+
                 <!-- author_block -->
                 <div class="ts-control has-top-spaced-large">
                     <div class="label">{=tr('appearances_authorblock')}</div>

@@ -240,6 +240,7 @@ abstract class BaseController
             'FontFamily' => 'sans',
             'FontSize' => 'medium',
             'HighlightJS' => true,
+            'Mermaid' => true,
             'AuthorBlock' => 'start',
             'PostsPerPage' => 10,
             'Theme' => 'default',
