@@ -298,7 +298,17 @@ final class App
 
     private function snakeToPascal(string $key): string
     {
-        return str_replace(' ', '', ucwords(str_replace('_', ' ', $key)));
+        $parts = explode('_', strtolower($key));
+        $acronyms = [
+            'js' => 'JS',
+        ];
+
+        $mapped = array_map(
+            static fn (string $part): string => $acronyms[$part] ?? ucfirst($part),
+            $parts
+        );
+
+        return implode('', $mapped);
     }
 
     private function pascalToSnake(string $key): string
