@@ -118,6 +118,7 @@ php -S 127.0.0.1:8080 -t public dev-router.php
 - 生产环境默认直接发布仓库内已编译好的静态资源，不要求服务器安装 Node.js。
 - 对共享虚拟空间，推荐在本地或 CI 预编译后再整体上传 `public/admin/assets/` 与 `public/themes/default/assets/`。
 - 前台与后台静态资源应作为物理文件交由 Nginx/Apache 直接承载，不通过 PHP 路由输出。
+- 当前前台 Mermaid、Highlight.js 等运行时资源均使用本地静态文件，不依赖外部 CDN。
 - 上传时不要只替换单个 `*.js` 文件；若构建参数后续升级为分包，需保持对应资源目录完整同步。
 
 ## 测试

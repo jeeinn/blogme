@@ -43,7 +43,7 @@
     <script src="{=$ctx->URL->RelativeRoot}themes/{=(string) ($ctx->Config->Theme ?? 'default')}/assets/tocas.min.js"></script>
     {if $ctx->Config->HighlightJS}
     <link rel="stylesheet" href="{=$ctx->URL->RelativeRoot}themes/{=(string) ($ctx->Config->Theme ?? 'default')}/assets/highlight.css" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="{=$ctx->URL->RelativeRoot}themes/{=(string) ($ctx->Config->Theme ?? 'default')}/assets/highlight.min.js"></script>
     {/if}
     <link rel="stylesheet" href="{=$ctx->URL->RelativeRoot}themes/{=(string) ($ctx->Config->Theme ?? 'default')}/assets/style.css" />
     <link rel="icon" type="image/png" href="{=$ctx->URL->RelativeRoot}themes/{=(string) ($ctx->Config->Theme ?? 'default')}/assets/favicon.png">
@@ -270,7 +270,9 @@
 
     {if $ctx->Config->HighlightJS}
     <script>
-        hljs.highlightAll()
+        if (window.hljs) {
+            window.hljs.highlightAll()
+        }
     </script>
     {/if}
 

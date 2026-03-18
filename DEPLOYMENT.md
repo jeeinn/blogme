@@ -58,6 +58,7 @@ php cli.php migrate
 - 生产环境默认使用仓库内已构建好的静态资源，不要求服务器安装 Node.js 或 npm。
 - 若修改了后台编辑器或前台 Mermaid 渲染逻辑，应在本地或 CI 执行构建后，再上传产物到服务器。
 - 这些资源必须以物理文件形式部署在 `public/` 下，由 Nginx/Apache 直接返回，不通过 PHP 路由转发输出。
+- 当前主题内的 Mermaid、Highlight.js 等前端运行时脚本也按此原则本地部署，不依赖外部 CDN。
 - 当前相关命令：
   - `npm run build:admin-editor`
   - `npm run build:theme-mermaid`
