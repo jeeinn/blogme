@@ -47,6 +47,7 @@ const ensureMermaid = () => {
         securityLevel: "strict",
         theme: "default",
         fontFamily: "inherit",
+        htmlLabels: false,
     });
     mermaidInitialized = true;
 };

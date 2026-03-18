@@ -274,7 +274,7 @@
     </script>
     {/if}
 
-    {if $ctx->HasMermaid}
+    {if $ctx->IsUnlocked}
         {if ($ctx->Config->Mermaid ?? true)}
         <script type="module" src="{=$ctx->URL->RelativeRoot}themes/{=(string) ($ctx->Config->Theme ?? 'default')}/assets/mermaid-page.js"></script>
         {/if}

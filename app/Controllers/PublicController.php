@@ -129,7 +129,6 @@ final class PublicController extends BaseController
             'PreviousPost' => $this->app->posts()->previous((string) $post['ID'], $config),
             'NextPost' => $this->app->posts()->next((string) $post['ID'], $config),
             'IsUnlocked' => $isUnlocked,
-            'HasMermaid' => $isUnlocked && $this->containsMermaidFence((string) $post['Content']),
         ]);
         header('Content-Type: text/html; charset=utf-8');
         echo $html;
@@ -278,10 +277,5 @@ final class PublicController extends BaseController
     private function xml(string $v): string
     {
         return htmlspecialchars($v, ENT_XML1 | ENT_QUOTES, 'UTF-8');
-    }
-
-    private function containsMermaidFence(string $markdown): bool
-    {
-        return preg_match('/(^|[\r\n])```mermaid(?:[ \t\r\n]|$)/i', $markdown) === 1;
     }
 }
