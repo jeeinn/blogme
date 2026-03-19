@@ -29,6 +29,102 @@
 
 如果主机禁用了 `.htaccess`，需在虚拟主机中配置等价重写规则。
 
+### 3.1 静态压缩
+
+- 项目中的 `public/.htaccess` 已加入 `mod_deflate` 与 `mod_brotli` 的压缩规则。
+- 若主机未启用对应模块，Apache 会自动跳过，不影响站点运行。
+- 建议至少启用一种：
+  - `mod_deflate`（通用，通常默认可用）
+  - `mod_brotli`（压缩率更高，现代环境优先）
+- 压缩对象建议限定为文本类资源：
+  - `text/html`
+  - `text/css`
+  - `application/javascript`
+  - `application/json`
+  - `image/svg+xml`
+- 不建议再压缩已高度压缩的二进制资源，如：
+  - `jpg`
+  - `png`
+  - `webp`
+  - `woff2`
+
+Apache 虚拟主机中可使用与 `public/.htaccess` 等价的配置：
+
+```apache
+<IfModule mod_headers.c>
+    Header append Vary Accept-Encoding
+</IfModule>
+
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/plain
+    AddOutputFilterByType DEFLATE text/html
+    AddOutputFilterByType DEFLATE text/css
+    AddOutputFilterByType DEFLATE text/javascript
+    AddOutputFilterByType DEFLATE application/javascript
+    AddOutputFilterByType DEFLATE application/json
+    AddOutputFilterByType DEFLATE application/xml
+    AddOutputFilterByType DEFLATE application/rss+xml
+    AddOutputFilterByType DEFLATE image/svg+xml
+</IfModule>
+
+<IfModule mod_brotli.c>
+    AddOutputFilterByType BROTLI_COMPRESS text/plain
+    AddOutputFilterByType BROTLI_COMPRESS text/html
+    AddOutputFilterByType BROTLI_COMPRESS text/css
+    AddOutputFilterByType BROTLI_COMPRESS text/javascript
+    AddOutputFilterByType BROTLI_COMPRESS application/javascript
+    AddOutputFilterByType BROTLI_COMPRESS application/json
+    AddOutputFilterByType BROTLI_COMPRESS application/xml
+    AddOutputFilterByType BROTLI_COMPRESS application/rss+xml
+    AddOutputFilterByType BROTLI_COMPRESS image/svg+xml
+</IfModule>
+```
+
+## 3.2 Nginx 压缩
+
+项目提供了 `public/nginx.rewrite.conf` 示例，可直接把压缩规则放在 `server` 块中；若你的部署统一在全局管理压缩，也可以挪到 `http` 块。
+
+建议配置：
+
+```nginx
+gzip on;
+gzip_vary on;
+gzip_min_length 1024;
+gzip_comp_level 6;
+gzip_proxied any;
+gzip_types
+    text/plain
+    text/css
+    text/javascript
+    application/javascript
+    application/json
+    application/xml
+    application/rss+xml
+    image/svg+xml;
+
+# 若已安装 brotli 模块，可额外启用
+brotli on;
+brotli_comp_level 5;
+brotli_min_length 1024;
+brotli_types
+    text/plain
+    text/css
+    text/javascript
+    application/javascript
+    application/json
+    application/xml
+    application/rss+xml
+    image/svg+xml;
+```
+
+说明：
+
+- `brotli` 指令仅在 Nginx 已安装对应模块时可用；若未安装，请只保留 `gzip`。
+- 对你当前体积较大的静态资源，传输压缩收益很明显：
+  - `public/admin/assets/editor-crepe.js`
+  - `public/themes/default/assets/mermaid-page.js`
+- 这类文件建议与现有缓存头一起使用，避免首次下载后重复传输。
+
 ## 4. 首次上线步骤
 
 1. 上传代码到服务器（建议 Git 部署）
