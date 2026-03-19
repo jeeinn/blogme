@@ -7,22 +7,50 @@ RewriteRule ^ - [L]
 # Keep static asset paths handled by Apache directly.
 RewriteRule ^(themes|admin/assets|uploads)/ - [L]
 
+<IfModule mod_headers.c>
+    Header append Vary Accept-Encoding
+</IfModule>
+
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/plain
+    AddOutputFilterByType DEFLATE text/html
+    AddOutputFilterByType DEFLATE text/css
+    AddOutputFilterByType DEFLATE text/javascript
+    AddOutputFilterByType DEFLATE application/javascript
+    AddOutputFilterByType DEFLATE application/json
+    AddOutputFilterByType DEFLATE application/xml
+    AddOutputFilterByType DEFLATE application/rss+xml
+    AddOutputFilterByType DEFLATE image/svg+xml
+</IfModule>
+
+<IfModule mod_brotli.c>
+    AddOutputFilterByType BROTLI_COMPRESS text/plain
+    AddOutputFilterByType BROTLI_COMPRESS text/html
+    AddOutputFilterByType BROTLI_COMPRESS text/css
+    AddOutputFilterByType BROTLI_COMPRESS text/javascript
+    AddOutputFilterByType BROTLI_COMPRESS application/javascript
+    AddOutputFilterByType BROTLI_COMPRESS application/json
+    AddOutputFilterByType BROTLI_COMPRESS application/xml
+    AddOutputFilterByType BROTLI_COMPRESS application/rss+xml
+    AddOutputFilterByType BROTLI_COMPRESS image/svg+xml
+</IfModule>
+
 <IfModule mod_expires.c>
     ExpiresActive On
-    ExpiresByType text/css "access plus 7 days"
-    ExpiresByType application/javascript "access plus 7 days"
-    ExpiresByType font/woff2 "access plus 7 days"
-    ExpiresByType font/woff "access plus 7 days"
-    ExpiresByType font/ttf "access plus 7 days"
-    ExpiresByType image/svg+xml "access plus 7 days"
-    ExpiresByType image/png "access plus 7 days"
-    ExpiresByType image/jpeg "access plus 7 days"
-    ExpiresByType image/webp "access plus 7 days"
+    ExpiresByType text/css "access plus 30 days"
+    ExpiresByType application/javascript "access plus 30 days"
+    ExpiresByType font/woff2 "access plus 30 days"
+    ExpiresByType font/woff "access plus 30 days"
+    ExpiresByType font/ttf "access plus 30 days"
+    ExpiresByType image/svg+xml "access plus 30 days"
+    ExpiresByType image/png "access plus 30 days"
+    ExpiresByType image/jpeg "access plus 30 days"
+    ExpiresByType image/webp "access plus 30 days"
 </IfModule>
 
 <IfModule mod_headers.c>
     <FilesMatch "\.(css|js|woff2?|ttf|svg|png|jpe?g|webp)$">
-        Header set Cache-Control "public, max-age=604800"
+        Header set Cache-Control "public, max-age=2592000"
     </FilesMatch>
 </IfModule>
 
