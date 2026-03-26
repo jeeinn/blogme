@@ -12,6 +12,7 @@
 /storage/logs/
 /storage/cache/
 /public/uploads/**
+/exports/
 /node_modules/
 
 # Keep upload directory tracked for .gitkeep only

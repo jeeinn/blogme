@@ -211,6 +211,14 @@ php cli.php migrate
 php cli.php reset-password user@example.com
 ```
 
+- 全量导出文章为 Markdown：
+
+```bash
+php cli.php export-markdown
+```
+
+说明：导出结果默认写入 `exports/markdown/`，每次执行会清空目录后再重建，文件名格式为 `{title} - {type}.md`。
+
 - 运行测试（仅开发环境）：
 
 ```bash

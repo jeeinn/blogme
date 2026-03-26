@@ -29,6 +29,7 @@
   - RSS 输出（`/rss.xml`）
   - 404 主题页
 - CLI：
+  - 导出 Markdown：`php cli.php export-markdown`
   - 重置密码：`php cli.php reset-password <email>`
 
 ## 项目结构
@@ -71,6 +72,14 @@ php cli.php migrate
 ```
 
 说明：如未执行 `migrate`，应用会在首次请求时自动初始化数据库。
+
+如需将数据库中的全部文章导出为本地 Markdown 文档，可执行：
+
+```bash
+php cli.php export-markdown
+```
+
+说明：导出结果默认写入 `exports/markdown/`，每次执行会先清空目录再全量重建，文件名格式为 `{title} - {type}.md`。
 
 3. 启动（开发模式）
 

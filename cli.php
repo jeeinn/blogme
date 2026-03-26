@@ -7,9 +7,10 @@ require __DIR__ . '/bootstrap/app.php';
 $app = bootstrap_app();
 
 $command = $argv[1] ?? '';
-if (!in_array($command, ['reset-password', 'migrate'], true)) {
+if (!in_array($command, ['export-markdown', 'reset-password', 'migrate'], true)) {
     echo "Usage:\n";
     echo "  php cli.php migrate\n";
+    echo "  php cli.php export-markdown\n";
     echo "  php cli.php reset-password <email>\n";
     exit(1);
 }
@@ -17,6 +18,13 @@ if (!in_array($command, ['reset-password', 'migrate'], true)) {
 if ($command === 'migrate') {
     $app->db()->migrate();
     echo "Database migration completed.\n";
+    exit(0);
+}
+
+if ($command === 'export-markdown') {
+    $service = new \Blogme\Services\MarkdownExportService($app->root(), $app->posts());
+    $result = $service->exportAll($app->config() ?? []);
+    echo "Exported {$result['count']} posts to {$result['directory']}\n";
     exit(0);
 }
 
