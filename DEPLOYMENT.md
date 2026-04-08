@@ -31,11 +31,34 @@
 
 ### 3.1 静态压缩
 
-- 项目中的 `public/.htaccess` 已加入 `mod_deflate` 与 `mod_brotli` 的压缩规则。
+- 项目中的 `public/.htaccess` 已加入 `mod_deflate` 与 `mod_brotli` 的实时压缩规则。
 - 若主机未启用对应模块，Apache 会自动跳过，不影响站点运行。
 - 建议至少启用一种：
   - `mod_deflate`（通用，通常默认可用）
   - `mod_brotli`（压缩率更高，现代环境优先）
+
+### 3.2 预压缩静态资源（推荐）
+
+项目支持构建时生成 `.gz` / `.br` 预压缩文件，Apache 通过 `mod_rewrite` 优先提供这些文件，
+避免实时压缩的 CPU 开销，同时获得更高压缩率（brotli quality 11）。
+
+构建步骤：
+
+```bash
+npm run compress        # 仅压缩（不重新构建 JS）
+npm run build           # 完整构建 + 压缩
+```
+
+`.htaccess` 中已配置自动检测：当浏览器支持 br/gzip 且对应 `.br`/`.gz` 文件存在时，
+自动返回预压缩版本。无需额外配置。
+
+压缩效果参考：
+
+| 文件 | 原始 | gzip | brotli |
+|------|------|------|--------|
+| editor-crepe.js | 4.97 MB | 1.54 MB | 1.19 MB |
+| mermaid-page.js | 2.72 MB | 799 KB | 604 KB |
+| tocas.min.css | 291 KB | 44 KB | 36 KB |
 - 压缩对象建议限定为文本类资源：
   - `text/html`
   - `text/css`
@@ -80,9 +103,14 @@ Apache 虚拟主机中可使用与 `public/.htaccess` 等价的配置：
 </IfModule>
 ```
 
-## 3.2 Nginx 压缩
+## 3.3 Nginx 压缩
 
 项目提供了 `public/nginx.rewrite.conf` 示例，可直接把压缩规则放在 `server` 块中；若你的部署统一在全局管理压缩，也可以挪到 `http` 块。
+
+Nginx 原生支持 `gzip_static` 指令，会自动查找同名 `.gz` 文件并直接返回，无需额外 rewrite 规则。
+配置中已添加 `gzip_static on;`，构建后的 `.gz` 文件会被自动使用。
+
+若安装了 brotli 模块，取消注释 `brotli_static on;` 即可启用 `.br` 预压缩文件。
 
 建议配置：
 
@@ -156,8 +184,10 @@ php cli.php migrate
 - 这些资源必须以物理文件形式部署在 `public/` 下，由 Nginx/Apache 直接返回，不通过 PHP 路由转发输出。
 - 当前主题内的 Mermaid、Highlight.js 等前端运行时脚本也按此原则本地部署，不依赖外部 CDN。
 - 当前相关命令：
-  - `npm run build:admin-editor`
-  - `npm run build:theme-mermaid`
+  - `npm run build:admin-editor` — 构建后台编辑器
+  - `npm run build:theme-mermaid` — 构建前台 Mermaid 渲染
+  - `npm run compress` — 生成 .gz/.br 预压缩文件
+  - `npm run build` — 完整构建（编辑器 + Mermaid + 预压缩）
 - 上传时应整体同步以下目录，而不是仅替换单个入口文件：
   - `public/admin/assets/`
   - `public/themes/default/assets/`

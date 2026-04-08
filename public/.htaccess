@@ -7,6 +7,40 @@ RewriteRule ^ - [L]
 # Keep static asset paths handled by Apache directly.
 RewriteRule ^(themes|admin/assets|uploads)/ - [L]
 
+# ── Pre-compressed static assets (.br / .gz) ──
+# 优先提供构建时生成的预压缩文件，避免实时压缩的 CPU 开销。
+# 优先级: brotli > gzip > 原始文件
+<IfModule mod_headers.c>
+    # Brotli 预压缩 (.br)
+    RewriteCond %{HTTP:Accept-Encoding} br
+    RewriteCond %{REQUEST_FILENAME}.br -f
+    RewriteRule ^(.+)\.(js|css)$ $1.$2.br [L]
+
+    <FilesMatch "\.js\.br$">
+        Header set Content-Encoding br
+        Header set Content-Type "application/javascript"
+    </FilesMatch>
+    <FilesMatch "\.css\.br$">
+        Header set Content-Encoding br
+        Header set Content-Type "text/css"
+    </FilesMatch>
+
+    # Gzip 预压缩 (.gz)
+    RewriteCond %{HTTP:Accept-Encoding} gzip
+    RewriteCond %{REQUEST_FILENAME}.gz -f
+    RewriteRule ^(.+)\.(js|css)$ $1.$2.gz [L]
+
+    <FilesMatch "\.js\.gz$">
+        Header set Content-Encoding gzip
+        Header set Content-Type "application/javascript"
+    </FilesMatch>
+    <FilesMatch "\.css\.gz$">
+        Header set Content-Encoding gzip
+        Header set Content-Type "text/css"
+    </FilesMatch>
+</IfModule>
+# ── / Pre-compressed static assets ──
+
 <IfModule mod_headers.c>
     Header append Vary Accept-Encoding
 </IfModule>

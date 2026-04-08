@@ -18,6 +18,10 @@
 /exports/
 /node_modules/
 
+# Pre-compressed build artifacts
+public/**/*.gz
+public/**/*.br
+
 # Keep upload directory tracked for .gitkeep only
 !/public/uploads/
 !/public/uploads/covers/
