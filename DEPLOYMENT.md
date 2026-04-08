@@ -110,7 +110,10 @@ Apache 虚拟主机中可使用与 `public/.htaccess` 等价的配置：
 Nginx 原生支持 `gzip_static` 指令，会自动查找同名 `.gz` 文件并直接返回，无需额外 rewrite 规则。
 配置中已添加 `gzip_static on;`，构建后的 `.gz` 文件会被自动使用。
 
-若安装了 brotli 模块，取消注释 `brotli_static on;` 即可启用 `.br` 预压缩文件。
+发行包中不包含 `.gz` 文件（zip 自身压缩效果等价）。Nginx 部署时如需启用 `gzip_static`，
+请在服务器上执行一次 `node scripts/compress.js` 生成 `.gz` 文件，或依赖 Nginx 的实时 gzip 压缩。
+
+若安装了 brotli 模块，取消注释 `brotli_static on;` 即可启用 `.br` 预压缩文件（发行包已包含）。
 
 建议配置：
 

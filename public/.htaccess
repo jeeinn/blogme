@@ -1,45 +1,48 @@
 RewriteEngine On
 
+# ── Pre-compressed static assets (.br / .gz) ──
+# 必须在「文件存在则直接返回」规则之前，否则原始文件会短路预压缩逻辑。
+# 优先级: brotli > gzip > 原始文件
+<IfModule mod_rewrite.c>
+    <IfModule mod_headers.c>
+        # Brotli 预压缩 (.br)
+        RewriteCond %{HTTP:Accept-Encoding} br
+        RewriteCond %{REQUEST_FILENAME}.br -f
+        RewriteRule ^(.+)\.(js|css)$ $1.$2.br [L]
+
+        <FilesMatch "\.js\.br$">
+            Header set Content-Encoding br
+            Header set Content-Type "application/javascript"
+        </FilesMatch>
+        <FilesMatch "\.css\.br$">
+            Header set Content-Encoding br
+            Header set Content-Type "text/css"
+        </FilesMatch>
+
+        # Gzip 预压缩 (.gz)
+        RewriteCond %{HTTP:Accept-Encoding} gzip
+        RewriteCond %{REQUEST_FILENAME}.gz -f
+        RewriteRule ^(.+)\.(js|css)$ $1.$2.gz [L]
+
+        <FilesMatch "\.js\.gz$">
+            Header set Content-Encoding gzip
+            Header set Content-Type "application/javascript"
+        </FilesMatch>
+        <FilesMatch "\.css\.gz$">
+            Header set Content-Encoding gzip
+            Header set Content-Type "text/css"
+        </FilesMatch>
+    </IfModule>
+</IfModule>
+# ── / Pre-compressed static assets ──
+
+# 已存在的物理文件/目录直接返回（放在预压缩规则之后）
 RewriteCond %{REQUEST_FILENAME} -f [OR]
 RewriteCond %{REQUEST_FILENAME} -d
 RewriteRule ^ - [L]
 
 # Keep static asset paths handled by Apache directly.
 RewriteRule ^(themes|admin/assets|uploads)/ - [L]
-
-# ── Pre-compressed static assets (.br / .gz) ──
-# 优先提供构建时生成的预压缩文件，避免实时压缩的 CPU 开销。
-# 优先级: brotli > gzip > 原始文件
-<IfModule mod_headers.c>
-    # Brotli 预压缩 (.br)
-    RewriteCond %{HTTP:Accept-Encoding} br
-    RewriteCond %{REQUEST_FILENAME}.br -f
-    RewriteRule ^(.+)\.(js|css)$ $1.$2.br [L]
-
-    <FilesMatch "\.js\.br$">
-        Header set Content-Encoding br
-        Header set Content-Type "application/javascript"
-    </FilesMatch>
-    <FilesMatch "\.css\.br$">
-        Header set Content-Encoding br
-        Header set Content-Type "text/css"
-    </FilesMatch>
-
-    # Gzip 预压缩 (.gz)
-    RewriteCond %{HTTP:Accept-Encoding} gzip
-    RewriteCond %{REQUEST_FILENAME}.gz -f
-    RewriteRule ^(.+)\.(js|css)$ $1.$2.gz [L]
-
-    <FilesMatch "\.js\.gz$">
-        Header set Content-Encoding gzip
-        Header set Content-Type "application/javascript"
-    </FilesMatch>
-    <FilesMatch "\.css\.gz$">
-        Header set Content-Encoding gzip
-        Header set Content-Type "text/css"
-    </FilesMatch>
-</IfModule>
-# ── / Pre-compressed static assets ──
 
 <IfModule mod_headers.c>
     Header append Vary Accept-Encoding

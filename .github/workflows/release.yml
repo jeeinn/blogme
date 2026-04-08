@@ -56,6 +56,18 @@ jobs:
             fi
           done
 
+          # ── Trim release size ──
+          # Remove .gz (zip itself compresses raw JS equally well; keep .br for superior ratio)
+          find "${DIST_ROOT}/public" -name '*.gz' -delete
+          # Remove TTF font fallbacks (all modern browsers support woff2)
+          find "${DIST_ROOT}/public" -name '*.ttf' -delete
+          # Remove JS source files (development only)
+          find "${DIST_ROOT}/public" -name '*-src.js' -delete
+          # Remove user uploads (not part of distribution)
+          rm -rf "${DIST_ROOT}/public/uploads/images/"*/ "${DIST_ROOT}/public/uploads/covers/"*.{jpg,jpeg,png,webp} 2>/dev/null || true
+          # Remove node_modules if accidentally copied
+          rm -rf "${DIST_ROOT}/node_modules" 2>/dev/null || true
+
           cd "${RUNNER_TEMP}"
           zip -r "${GITHUB_WORKSPACE}/${PACKAGE_NAME}.zip" "${PACKAGE_NAME}"
 
