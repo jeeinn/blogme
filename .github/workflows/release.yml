@@ -29,6 +29,17 @@ jobs:
       - name: Install production dependencies
         run: composer install --no-dev --prefer-dist --no-progress --optimize-autoloader
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - name: Build frontend assets
+        run: |
+          npm ci
+          npm run build
+
       - name: Prepare distributable
         shell: bash
         run: |
@@ -39,7 +50,7 @@ jobs:
 
           mkdir -p "${DIST_ROOT}"
 
-          for path in app bootstrap public resources storage vendor .htaccess cli.php composer.json composer.lock LICENSE README.md DEPLOYMENT.md; do
+          for path in app bootstrap public resources storage vendor scripts .htaccess cli.php composer.json composer.lock package.json package-lock.json LICENSE README.md DEPLOYMENT.md; do
             if [ -e "${path}" ]; then
               cp -a "${path}" "${DIST_ROOT}/"
             fi
