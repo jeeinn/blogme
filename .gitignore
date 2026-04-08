@@ -1,8 +1,11 @@
 # IDE
 .idea
 .codeartsdoer
+.kiro
 
 # project
+*.log
+*.csv
 /vendor/
 /.phpunit.cache/
 /db.sqlite
