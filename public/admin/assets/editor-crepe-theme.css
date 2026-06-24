@@ -15,9 +15,12 @@
  *
  * Uses the same variable values as @milkdown/crepe frame-dark theme.
  * Triggered by OS preference or Tocas UI manual dark class on <html>.
+ *
+ * Both paths guard against html.is-light so that an explicit light-mode
+ * preference always wins. Variables are defined once via a shared rule
+ * to prevent divergent edits.
  */
 
-/* OS-level dark preference (when Tocas has not forced light mode) */
 @media (prefers-color-scheme: dark) {
     html:not(.is-light) .milkdown {
         --crepe-color-background: #1a1a1a;
@@ -47,8 +50,9 @@
     }
 }
 
-/* Tocas UI manual dark mode (html.is-dark) */
-html.is-dark .milkdown {
+/* Tocas UI manual dark mode (html.is-dark) without OS dark preference.
+   Guard with :not(.is-light) so explicit light-mode always wins. */
+html.is-dark:not(.is-light) .milkdown {
     --crepe-color-background: #1a1a1a;
     --crepe-color-on-background: #e6e6e6;
     --crepe-color-surface: #121212;

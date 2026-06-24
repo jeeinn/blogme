@@ -37,6 +37,17 @@ const mermaidLanguage = LanguageDescription.of({
 let mermaidInitialized = false;
 let mermaidRenderIndex = 0;
 
+const isDarkMode = () => {
+    const html = document.documentElement;
+    if (html.classList.contains("is-light")) {
+        return false;
+    }
+    if (html.classList.contains("is-dark")) {
+        return true;
+    }
+    return window.matchMedia("(prefers-color-scheme: dark)").matches;
+};
+
 const ensureMermaid = () => {
     if (mermaidInitialized) {
         return;
@@ -45,7 +56,7 @@ const ensureMermaid = () => {
     mermaid.initialize({
         startOnLoad: false,
         securityLevel: "strict",
-        theme: "default",
+        theme: isDarkMode() ? "dark" : "default",
         fontFamily: "inherit",
         htmlLabels: false,
     });

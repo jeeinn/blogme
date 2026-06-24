@@ -2,6 +2,7 @@
 .idea
 .codeartsdoer
 .kiro
+.codegraph
 
 # project
 *.log

@@ -8,6 +8,10 @@
     }
 }
 
+html.is-dark .logo {
+    filter: invert(1);
+}
+
 body {
     font-family: "Noto Sans TC", "Noto Sans SC", "Noto Sans JP", "Noto Sans KR";
 }
@@ -273,4 +277,17 @@ body {
 
 .block-editor .milkdown {
     min-height: 100%;
+}
+
+/* Dark mode: align wrapper background with Crepe editor */
+@media (prefers-color-scheme: dark) {
+    html:not(.is-light) .block-editor {
+        border-color: var(--ts-gray-600);
+        background: var(--crepe-color-background, #1a1a1a);
+    }
+}
+
+html.is-dark:not(.is-light) .block-editor {
+    border-color: var(--ts-gray-600);
+    background: var(--crepe-color-background, #1a1a1a);
 }
