@@ -2,14 +2,22 @@
   "name": "blogme-admin-editor",
   "private": true,
   "version": "1.0.0",
-  "description": "Build tooling for blogme admin Milkdown Crepe editor assets",
+  "description": "Build tooling for blogme admin Editor.js assets (replaces Milkdown Crepe)",
   "scripts": {
-    "build:admin-editor": "esbuild public/admin/assets/editor-crepe-src.js --bundle --format=esm --target=es2020 --minify --outfile=public/admin/assets/editor-crepe.js --loader:.css=css --loader:.woff2=file --loader:.woff=file --loader:.ttf=file --loader:.otf=file --loader:.eot=file --loader:.svg=file --loader:.png=file --asset-names=editor-assets/[name]-[hash]",
+    "build:admin-editor": "esbuild public/admin/assets/editor-ejs-src.js --bundle --format=esm --target=es2020 --minify --outfile=public/admin/assets/editor-ejs.js --loader:.css=css --loader:.woff2=file --loader:.woff=file --loader:.ttf=file --loader:.otf=file --loader:.eot=file --loader:.svg=file --loader:.png=file --asset-names=editor-assets/[name]-[hash]",
     "build:theme-mermaid": "esbuild public/themes/default/assets/mermaid-page-src.js --bundle --format=esm --target=es2020 --minify --outfile=public/themes/default/assets/mermaid-page.js"
   },
   "devDependencies": {
-    "@milkdown/crepe": "7.18.0",
-    "esbuild": "^0.25.9"
+    "@editorjs/code": "^2.9.4",
+    "@editorjs/delimiter": "^1.4.2",
+    "@editorjs/editorjs": "^2.31.7",
+    "@editorjs/header": "^2.8.9",
+    "@editorjs/image": "^2.10.3",
+    "@editorjs/list": "^2.0.9",
+    "@editorjs/quote": "^2.7.6",
+    "@editorjs/table": "^2.4.6",
+    "esbuild": "^0.25.9",
+    "markdown-it": "^14.1.0"
   },
   "dependencies": {
     "dompurify": "^3.3.3",

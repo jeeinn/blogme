@@ -1,6 +1,6 @@
 {layout 'admin_base.html'}
 {block content}
-<link rel="stylesheet" href="{=$ctx->URL->RelativeRoot}admin/assets/editor-crepe.css" />
+<link rel="stylesheet" href="{=$ctx->URL->RelativeRoot}admin/assets/editor-ejs.css" />
 <script src="{=$ctx->URL->RelativeRoot}admin/assets/alpine.min.js" defer></script>
 <script src="{=$ctx->URL->RelativeRoot}admin/assets/post-draft.js"></script>
 
@@ -284,16 +284,29 @@
 </script>
 
 <script type="module">
-import { initBlogmeCrepe } from {=$ctx->URL->RelativeRoot . 'admin/assets/editor-crepe.js'}
+  // Load the editor lazily so the heavy bundle never blocks first paint.
+  const startBlogmeEditor = () => {
+    import({=$ctx->URL->RelativeRoot . 'admin/assets/editor-ejs.js'})
+      .then((module) => {
+        module.initBlogmeEditor({
+          formSelector: "form[x-data='data']",
+          contentSelector: "#content",
+          holderSelector: "#block-editor",
+          uploadUrl: "../photos/api",
+          csrfToken: {=$ctx->CSRF},
+          urlRoot: {=$ctx->URL->RelativeRoot},
+        });
+      })
+      .catch((err) => {
+        console.error("Failed to load blogme editor:", err);
+      });
+  };
 
-initBlogmeCrepe({
-    formSelector: "form[x-data='data']",
-    contentSelector: "#content",
-    holderSelector: "#block-editor",
-    uploadUrl: "../photos/api",
-    csrfToken: {=$ctx->CSRF},
-    urlRoot: {=$ctx->URL->RelativeRoot},
-})
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", startBlogmeEditor, { once: true });
+  } else {
+    startBlogmeEditor();
+  }
 </script>
 
 <script>
