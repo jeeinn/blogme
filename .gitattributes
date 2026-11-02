@@ -1,0 +1,15 @@
+# 统一换行符为 LF（与 esbuild 构建产物一致，避免重建时 CRLF/LF 抖动）
+* text=auto eol=lf
+
+# 二进制资源不转换
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.otf binary
+*.eot binary
+*.ico binary
