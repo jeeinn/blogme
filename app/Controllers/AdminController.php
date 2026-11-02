@@ -265,7 +265,7 @@ final class AdminController extends BaseController
         $now = time();
         echo $this->app->view()->renderAdmin('admin_settings', [
             ...$this->baseData($routePattern),
-            'Version' => '0.5.1-php',
+            'Version' => '0.6.0-php',
             'RuntimeVersion' => PHP_VERSION,
             'Timezones' => $this->availableTimezones(),
             'Locales' => $this->availableLocales(),
