@@ -6,7 +6,6 @@ import {
     codeBlockSchema,
     setBlockTypeCommand,
 } from "@milkdown/kit/preset/commonmark";
-import mermaid from "mermaid";
 import "./editor-crepe-theme.css";
 import "@milkdown/crepe/theme/frame.css";
 
@@ -34,15 +33,21 @@ const mermaidLanguage = LanguageDescription.of({
     support: mermaidCodeMirrorSupport,
 });
 
+let mermaidModule = null;
 let mermaidInitialized = false;
 let mermaidRenderIndex = 0;
 
-const ensureMermaid = () => {
+const ensureMermaid = async mermaidUrl => {
+    if (!mermaidModule) {
+        const resolvedUrl = mermaidUrl || "./mermaid-lazy.js";
+        const imported = await import(resolvedUrl);
+        mermaidModule = imported.default || imported;
+    }
     if (mermaidInitialized) {
         return;
     }
 
-    mermaid.initialize({
+    mermaidModule.initialize({
         startOnLoad: false,
         securityLevel: "strict",
         theme: "default",
@@ -52,10 +57,10 @@ const ensureMermaid = () => {
     mermaidInitialized = true;
 };
 
-const renderMermaidSvg = async source => {
-    ensureMermaid();
+const renderMermaidSvg = async (source, mermaidUrl) => {
+    await ensureMermaid(mermaidUrl);
     const diagramId = `blogme-mermaid-${mermaidRenderIndex++}`;
-    const { svg } = await mermaid.render(diagramId, source);
+    const { svg } = await mermaidModule.render(diagramId, source);
     return svg;
 };
 
@@ -123,6 +128,7 @@ export const initBlogmeCrepe = async (options = {}) => {
     const uploadUrl = (options.uploadUrl ?? "").trim();
     const csrfToken = options.csrfToken ?? "";
     const urlRoot = (options.urlRoot ?? "/").trim();
+    const mermaidUrl = (options.mermaidUrl ?? "./mermaid-lazy.js").trim();
 
     if (!form || !contentInput || !holder) {
         return null;
@@ -159,7 +165,7 @@ export const initBlogmeCrepe = async (options = {}) => {
                     return null;
                 }
 
-                void renderMermaidSvg(source)
+                void renderMermaidSvg(source, mermaidUrl)
                     .then(applyPreview)
                     .catch(() => {
                         applyPreview(null);
