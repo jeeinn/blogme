@@ -54,14 +54,6 @@ function isStandaloneImage(html) {
   };
 }
 
-function listToHtml(block) {
-  const tag = block.data.style === "ordered" ? "ol" : "ul";
-  const items = (block.data.items || [])
-    .map((item) => `<li>${item || ""}</li>`)
-    .join("");
-  return `<${tag}>${items}</${tag}>`;
-}
-
 function buildList(tokens, start, env, out) {
   const open = tokens[start];
   const style = open.type === "ordered_list_open" ? "ordered" : "unordered";
@@ -71,8 +63,8 @@ function buildList(tokens, start, env, out) {
     style === "ordered" ? "ordered_list_close" : "bullet_list_close";
   while (i < tokens.length && tokens[i].type !== closeType) {
     if (tokens[i].type === "list_item_open") {
-      const res = buildListItem(tokens, i, env, out);
-      items.push(res.html);
+      const res = buildListItem(tokens, i, env);
+      items.push(res.item);
       i = res.next;
     } else {
       i++;
@@ -82,13 +74,17 @@ function buildList(tokens, start, env, out) {
   return i + 1;
 }
 
-function buildListItem(tokens, start, env, out) {
+// Editor.js List tool v2 stores every item as { content, meta, items }
+// where `items` holds nested list items. Keep this shape in sync with
+// @editorjs/list or rendering/saving breaks.
+function buildListItem(tokens, start, env) {
   let i = start + 1;
   const parts = [];
+  const children = [];
   while (i < tokens.length && tokens[i].type !== "list_item_close") {
     const t = tokens[i];
     if (t.type === "paragraph_open") {
-      parts.push("<p>" + renderInline(tokens[i + 1]) + "</p>");
+      parts.push(renderInline(tokens[i + 1]));
       i += 3;
     } else if (
       t.type === "bullet_list_open" ||
@@ -96,12 +92,19 @@ function buildListItem(tokens, start, env, out) {
     ) {
       const nested = [];
       i = buildList(tokens, i, env, nested);
-      if (nested.length) parts.push(listToHtml(nested[0]));
+      nested.forEach((block) => {
+        if (block.type === "list" && block.data) {
+          children.push(...(block.data.items || []));
+        }
+      });
     } else {
       i++;
     }
   }
-  return { html: parts.join(""), next: i + 1 };
+  return {
+    item: { content: parts.join(" "), meta: {}, items: children },
+    next: i + 1,
+  };
 }
 
 function buildBlockquote(tokens, start, env, out) {
@@ -118,7 +121,11 @@ function buildBlockquote(tokens, start, env, out) {
     ) {
       const nested = [];
       i = buildList(tokens, i, env, nested);
-      if (nested.length) parts.push(listToHtml(nested[0]));
+      nested.forEach((block) => {
+        if (block.type === "list") {
+          parts.push(renderListBlock(block.data));
+        }
+      });
     } else {
       i++;
     }
@@ -246,6 +253,13 @@ function escapeHtmlAsText(text) {
 // ---------------------------------------------------------------------------
 
 function htmlToMarkdown(html) {
+  if (typeof html !== "string") {
+    if (html && typeof html === "object") {
+      // Defensive: never stringify objects into markdown (e.g. List v2 items).
+      return htmlToMarkdown(html.content ?? "");
+    }
+    return "";
+  }
   if (!html) return "";
   let doc;
   try {
@@ -382,15 +396,23 @@ function renderTableHtml(tableNode) {
   return lines.join("\n");
 }
 
-function renderListBlock(data) {
+function renderListBlock(data, depth = 0) {
   const ordered = data.style === "ordered";
   const items = data.items || [];
   const lines = [];
-  items.forEach((itemHtml, idx) => {
+  const indent = "  ".repeat(depth);
+  items.forEach((item, idx) => {
+    // List tool v2 saves items as objects ({ content, items }); older data
+    // (and our own adapter fallbacks) may still use plain strings.
+    const itemHtml = typeof item === "string" ? item : item && item.content;
+    const nestedItems =
+      item && typeof item === "object" && Array.isArray(item.items)
+        ? item.items
+        : [];
     const marker = ordered ? idx + 1 + ". " : "- ";
     const markerPad = " ".repeat(marker.length);
-    const md2 = htmlToMarkdown(itemHtml);
-    const subLines = md2.split("\n");
+    const childMd = htmlToMarkdown(itemHtml);
+    const subLines = childMd.split("\n");
     let first = true;
     for (const ln of subLines) {
       if (ln.trim() === "") {
@@ -398,11 +420,14 @@ function renderListBlock(data) {
         continue;
       }
       if (first) {
-        lines.push(marker + ln);
+        lines.push(indent + marker + ln);
         first = false;
       } else {
-        lines.push(markerPad + ln);
+        lines.push(indent + markerPad + ln);
       }
+    }
+    if (nestedItems.length) {
+      lines.push(renderListBlock({ style: data.style, items: nestedItems }, depth + 1));
     }
   });
   return lines.join("\n");

@@ -106,39 +106,55 @@ export const initBlogmeEditor = async (options = {}) => {
     },
   };
 
-  const editor = new EditorJS({
-    holder,
-    tools: {
-      header: { class: Header, config: { placeholder: "标题", levels: [2, 3, 4] } },
-      list: { class: List, config: { defaultStyle: "unordered" } },
-      image: {
-        class: Image,
-        config: {
-          uploader: imageUploader,
-          types: "image/*",
+  let editor;
+  try {
+    editor = new EditorJS({
+      holder,
+      tools: {
+        header: { class: Header, config: { placeholder: "标题", levels: [2, 3, 4] } },
+        list: { class: List, config: { defaultStyle: "unordered" } },
+        image: {
+          class: Image,
+          config: {
+            uploader: imageUploader,
+            types: "image/*",
+          },
         },
+        quote: { class: Quote, config: { placeholder: "引用内容" } },
+        code: { class: CodeTool, config: { placeholder: "代码" } },
+        delimiter: Delimiter,
+        table: { class: Table, config: { rows: 2, cols: 2 } },
+        mermaid: MermaidTool,
       },
-      quote: { class: Quote, config: { placeholder: "引用内容" } },
-      code: { class: CodeTool, config: { placeholder: "代码" } },
-      delimiter: Delimiter,
-      table: { class: Table, config: { rows: 2, cols: 2 } },
-      mermaid: MermaidTool,
-    },
-    data: { blocks: markdownToBlocks(initialMarkdown) },
-    onChange: async () => {
-      try {
-        const output = await editor.save();
-        latestMarkdown = blocksToMarkdown(output.blocks);
-        contentInput.value = latestMarkdown;
-        setDirtyState(latestMarkdown !== initialMarkdown);
-      } catch (e) {
-        // Keep the last good markdown so a transient save error can't wipe content.
-        console.error("Editor.js save failed:", e);
-      }
-    },
-  });
+      data: { blocks: markdownToBlocks(initialMarkdown) },
+      onChange: async () => {
+        try {
+          const output = await editor.save();
+          latestMarkdown = blocksToMarkdown(output.blocks);
+          contentInput.value = latestMarkdown;
+          setDirtyState(latestMarkdown !== initialMarkdown);
+        } catch (e) {
+          // Keep the last good markdown so a transient save error can't wipe content.
+          console.error("Editor.js save failed:", e);
+        }
+      },
+    });
 
-  await editor.isReady;
+    await editor.isReady;
+  } catch (e) {
+    // Never leave the page without an editable body: fall back to the raw
+    // markdown textarea so the article can still be edited and saved.
+    console.error("Editor.js init failed, falling back to textarea:", e);
+    holder.style.display = "none";
+    contentInput.style.display = "";
+    contentInput.style.minHeight = "420px";
+    contentInput.value = initialMarkdown;
+    form.addEventListener("submit", () => {
+      contentInput.value = contentInput.value || initialMarkdown;
+      setDirtyState(false);
+    });
+    return null;
+  }
 
   // Establish the baseline after initial render.
   try {
