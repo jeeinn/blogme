@@ -158,6 +158,10 @@ final class GoTemplateEngineTest extends TestCase
             ],
             'Message' => '',
             'CSRF' => 'csrf-token',
+            'SEO' => [
+                'Lang' => 'en-us',
+                'OgLocale' => 'en_us',
+            ],
             'URL' => [
                 'Root' => 'https://example.com/',
                 'Absolute' => 'https://example.com/post/demo',

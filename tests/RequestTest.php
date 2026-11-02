@@ -37,5 +37,55 @@ final class RequestTest extends TestCase
             'HTTP_X_FORWARDED_PROTO' => 'http',
         ]));
     }
+
+    public function testPathFromServerUsesRequestUriPath(): void
+    {
+        self::assertSame('/post/foo', Request::pathFromServer([
+            'REQUEST_URI' => '/post/foo?x=1',
+        ]));
+    }
+
+    public function testPathFromServerStripsScriptNamePrefix(): void
+    {
+        self::assertSame('/post/foo', Request::pathFromServer([
+            'REQUEST_URI' => '/index.php/post/foo',
+            'SCRIPT_NAME' => '/index.php',
+        ]));
+    }
+
+    public function testPathFromServerStripsSubdirScriptPrefix(): void
+    {
+        self::assertSame('/post/foo', Request::pathFromServer([
+            'REQUEST_URI' => '/blog/index.php/post/foo',
+            'SCRIPT_NAME' => '/blog/index.php',
+        ]));
+    }
+
+    public function testPathFromServerFallsBackToPathInfo(): void
+    {
+        self::assertSame('/post/foo', Request::pathFromServer([
+            'REQUEST_URI' => '/index.php',
+            'SCRIPT_NAME' => '/index.php',
+            'PATH_INFO' => '/post/foo',
+        ]));
+    }
+
+    public function testPathFromServerNormalizesRoot(): void
+    {
+        self::assertSame('/', Request::pathFromServer([
+            'REQUEST_URI' => '/index.php',
+            'SCRIPT_NAME' => '/index.php',
+        ]));
+        self::assertSame('/', Request::pathFromServer([
+            'REQUEST_URI' => '/',
+        ]));
+    }
+
+    public function testPathFromServerNormalizesTrailingSlash(): void
+    {
+        self::assertSame('/post/foo', Request::pathFromServer([
+            'REQUEST_URI' => '/post/foo/',
+        ]));
+    }
 }
 

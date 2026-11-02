@@ -18,18 +18,50 @@ final class Request
 
     public static function capture(): self
     {
-        $uriPath = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH);
-        if (!is_string($uriPath) || $uriPath === '') {
-            $uriPath = '/';
-        }
         return new self(
             strtoupper($_SERVER['REQUEST_METHOD'] ?? 'GET'),
-            rtrim($uriPath, '/') === '' ? '/' : rtrim($uriPath, '/'),
+            self::pathFromServer($_SERVER),
             $_GET,
             $_POST,
             $_FILES,
             $_SERVER
         );
+    }
+
+    /**
+     * Resolve the route path from server vars, compatible with both the
+     * canonical Laravel nginx rewrite (`try_files ... /index.php?$query_string`)
+     * and PATH_INFO style rewrites (`/index.php/$request_uri`).
+     */
+    public static function pathFromServer(array $server): string
+    {
+        $uriPath = parse_url((string)($server['REQUEST_URI'] ?? '/'), PHP_URL_PATH);
+        if (!is_string($uriPath) || $uriPath === '') {
+            $uriPath = '/';
+        }
+
+        $scriptName = (string)($server['SCRIPT_NAME'] ?? '');
+        if ($scriptName !== '' && str_starts_with($uriPath, $scriptName)) {
+            $uriPath = substr($uriPath, strlen($scriptName));
+        } else {
+            $phpSelf = (string)($server['PHP_SELF'] ?? '');
+            if ($phpSelf !== '' && str_starts_with($uriPath, $phpSelf)) {
+                $uriPath = substr($uriPath, strlen($phpSelf));
+            }
+        }
+
+        if (($uriPath === '' || $uriPath === '/') && isset($server['PATH_INFO'])) {
+            $pathInfo = (string)$server['PATH_INFO'];
+            if ($pathInfo !== '') {
+                $uriPath = $pathInfo;
+            }
+        }
+
+        if ($uriPath === '') {
+            $uriPath = '/';
+        }
+
+        return rtrim($uriPath, '/') === '' ? '/' : rtrim($uriPath, '/');
     }
 
     public function method(): string
