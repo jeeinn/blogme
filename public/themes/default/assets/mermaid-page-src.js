@@ -1,15 +1,21 @@
 import DOMPurify from "dompurify";
-import mermaid from "mermaid";
 
+const MERMAID_LAZY_URL = new URL("./mermaid-lazy.js", import.meta.url).href;
+
+let mermaidModule = null;
 let mermaidInitialized = false;
 let mermaidRenderIndex = 0;
 
-const ensureMermaid = () => {
+const ensureMermaid = async () => {
+    if (!mermaidModule) {
+        const imported = await import(MERMAID_LAZY_URL);
+        mermaidModule = imported.default || imported;
+    }
     if (mermaidInitialized) {
         return;
     }
 
-    mermaid.initialize({
+    mermaidModule.initialize({
         startOnLoad: false,
         securityLevel: "strict",
         theme: "default",
@@ -39,8 +45,9 @@ const renderDiagram = async (codeBlock, index) => {
     }
 
     try {
+        await ensureMermaid();
         const diagramId = `blogme-post-mermaid-${index}-${mermaidRenderIndex++}`;
-        const { svg, bindFunctions } = await mermaid.render(diagramId, source);
+        const { svg, bindFunctions } = await mermaidModule.render(diagramId, source);
         container.innerHTML = sanitizeSvg(svg);
         bindFunctions?.(container);
         codeBlock.parentElement?.replaceWith(container);
@@ -61,7 +68,6 @@ const renderMermaidBlocks = async () => {
         return;
     }
 
-    ensureMermaid();
     for (const [index, codeBlock] of codeBlocks.entries()) {
         await renderDiagram(codeBlock, index);
     }
