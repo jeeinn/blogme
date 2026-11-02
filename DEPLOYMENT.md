@@ -80,11 +80,20 @@ Apache 虚拟主机中可使用与 `public/.htaccess` 等价的配置：
 </IfModule>
 ```
 
-## 3.2 Nginx 压缩
+## 3.2 Nginx 配置示例
 
-项目提供了 `public/nginx.rewrite.conf` 示例，可直接把压缩规则放在 `server` 块中；若你的部署统一在全局管理压缩，也可以挪到 `http` 块。
+项目根下提供了 `public/nginx.rewrite.conf`，它是一份**完整的 Nginx `server` 块示例**，
+包含四部分：
 
-建议配置：
+1. 静态压缩（`gzip` / 可选 `brotli`）
+2. 路由重写（`try_files ... /index.php`）—— 兼容类 Laravel 的部署方式
+3. 静态资源目录的缓存头（`/uploads/`、`/themes/`、`/admin/assets/`）
+4. PHP-FPM 转发（`location ~ \.php$`）
+
+推荐直接将整份文件内容并入你的 `server { }` 块（或 `include` 引用），
+再按需修改 `fastcgi_pass` 为实际的 PHP-FPM 监听地址（unix socket 或 `127.0.0.1:9000`）。
+
+### 3.2.1 静态压缩
 
 ```nginx
 gzip on;
@@ -124,6 +133,28 @@ brotli_types
   - `public/admin/assets/editor-crepe.js`
   - `public/themes/default/assets/mermaid-page.js`
 - 这类文件建议与现有缓存头一起使用，避免首次下载后重复传输。
+
+### 3.2.2 路由重写与 PHP-FPM 转发（核心）
+
+```nginx
+location / {
+    try_files $uri $uri/ /index.php?$query_string;
+}
+
+location ~ \.php$ {
+    fastcgi_pass   127.0.0.1:9000;
+    include        fastcgi_params;
+    fastcgi_param  SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
+    fastcgi_hide_header X-Powered-By;
+    fastcgi_intercept_errors on;
+}
+```
+
+说明：
+
+- 物理文件优先由 Nginx 直接返回，未命中的动态请求统一回退到 `index.php`，
+  由 PHP 端（`Blogme\Core\Request`）解析真实路由，无需额外的 rewrite 规则。
+- 主题 `/assets/*` 路径交由应用按当前主题映射，物理文件缺失时回退 `index.php`。
 
 ## 4. 首次上线步骤
 

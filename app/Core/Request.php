@@ -40,13 +40,20 @@ final class Request
             $uriPath = '/';
         }
 
-        $scriptName = (string)($server['SCRIPT_NAME'] ?? '');
-        if ($scriptName !== '' && str_starts_with($uriPath, $scriptName)) {
-            $uriPath = substr($uriPath, strlen($scriptName));
-        } else {
-            $phpSelf = (string)($server['PHP_SELF'] ?? '');
-            if ($phpSelf !== '' && str_starts_with($uriPath, $phpSelf)) {
-                $uriPath = substr($uriPath, strlen($phpSelf));
+        // Strip an "/index.php" prefix for PATH_INFO style rewrites. Only PHP
+        // entry scripts are stripped: under `php -S` router mode SCRIPT_NAME
+        // and PHP_SELF equal the requested path itself (e.g. /admin/posts),
+        // and stripping those would break static serving and routing.
+        foreach ([(string)($server['SCRIPT_NAME'] ?? ''), (string)($server['PHP_SELF'] ?? '')] as $script) {
+            if ($script === '' || !str_ends_with($script, '.php')) {
+                continue;
+            }
+            if (str_starts_with($uriPath, $script)) {
+                $remainder = substr($uriPath, strlen($script));
+                if ($remainder === '' || $remainder[0] === '/') {
+                    $uriPath = $remainder === '' ? '/' : $remainder;
+                }
+                break;
             }
         }
 
